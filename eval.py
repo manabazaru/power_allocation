@@ -18,7 +18,6 @@ class GroupEvaluator():
         self.sinr = np.zeros(self.usr_n)
         self.sum_capacity = 0
         self.set_all()
-        # print(np.linalg.norm(self.w, ord=2))
     
     def set_noise(self):
         bandwidth_bd = 10 * np.log10(self.bandwidth)

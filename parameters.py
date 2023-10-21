@@ -1,5 +1,4 @@
 class Parameter:
-    users_per_group = 60
     z = 20
     c = 299792.458   # light speed [km/s]
     # for haps

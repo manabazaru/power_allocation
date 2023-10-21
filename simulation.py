@@ -29,14 +29,14 @@ def generate_random_user_angle(user_n, set_n):
         ang_arr = utils.angr2ang(angr_arr)
         save.save_angle_arr(ang_arr, f"random_user={user_n}_r={20}_{set_idx}")
 
-def save_AUS_flops(cnt_per_data, user_n_list, set_list, radius):
+def save_AUS_flops(cnt_per_data, usrs_per_group, user_n_list, set_list, radius):
     for user_n in user_n_list:
         aus_flop_arr = []
-        aus_flop_filename = f"random_user={user_n}_alg=AUS_r={radius}_users_per_group={param.users_per_group}"
+        aus_flop_filename = f"random_user={user_n}_alg=AUS_r={radius}_users_per_group={usrs_per_group}"
         for set_idx in set_list:
             filename = f"random_user={user_n}_r={radius}_{set_idx}"
             ang_arr = load.load_angle(filename)
-            eqpt = AUSEquipment(ang_arr)
+            eqpt = AUSEquipment(ang_arr, usrs_per_group)
             for loop_idx in range(cnt_per_data):
                 aus = grouping.AUS(eqpt)
                 aus.execute()
@@ -44,15 +44,15 @@ def save_AUS_flops(cnt_per_data, user_n_list, set_list, radius):
         save_flop = np.array(aus_flop_arr)
         save.save_flop_arrs(save_flop, aus_flop_filename)
 
-def save_MRUS_flops(cnt_per_data, user_n_list, set_list, radius, m_list):
+def save_MRUS_flops(cnt_per_data, usrs_per_group, user_n_list, set_list, radius, m_list):
     for m in m_list:
         for user_n in user_n_list:
-            mrus_flop_filename = f"random_user={user_n}_alg=MRUS_m={m}_r={radius}_users_per_group={param.users_per_group}"
+            mrus_flop_filename = f"random_user={user_n}_alg=MRUS_m={m}_r={radius}_users_per_group={usrs_per_group}"
             mrus_flop_arr = []
             for set_idx in set_list:
                 filename = f"random_user={user_n}_r={radius}_{set_idx}"
                 ang_arr = load.load_angle(filename)
-                eqpt = AUSEquipment(ang_arr)
+                eqpt = AUSEquipment(ang_arr, usrs_per_group)
                 for loop_idx in range(cnt_per_data):
                     mrus = grouping.MRangeAUS(eqpt, m)
                     mrus.execute()
@@ -64,18 +64,13 @@ def save_cities_csv():
     for city in prop.cities:
         save_city_csv(city)
 
-def test_hist():
-    for city in prop.cities:
-        ang_arr = load.load_angle(city)
-        fig.hist_usr_angles(ang_arr, city)
-
-def execute_simulation(m_list):
+def execute_simulation(m_list, usrs_per_group):
     cities = prop.main_cities
     for city in cities:
         cap_title = 'Capacity_' + city
         sinr_title = 'SINR_' + city
         ang_arr = load.load_angle(city)
-        eqpt = AUSEquipment(ang_arr)
+        eqpt = AUSEquipment(ang_arr, usrs_per_group)
         haps = phaps()
         usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
         alg_list = []

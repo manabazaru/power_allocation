@@ -5,11 +5,11 @@ from parameters import Parameter as param
 import tqdm
 
 class AUSEquipment():
-    def __init__(self, ang_arr, *args):
+    def __init__(self, ang_arr, usrs_per_group, *args):
         # Angle array without removed users.
         self.ang_arr = ang_arr
         self.usr_n = len(self.ang_arr)
-        self.usrs_per_group = param.users_per_group
+        self.usrs_per_group = usrs_per_group
         self.args = args
         # Removed user array to adjust number of users for grouping.
         self.rm_usr_arr = self.get_removed_user_arr(ang_arr)

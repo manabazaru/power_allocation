@@ -57,9 +57,6 @@ class BeamForming():
         self.set_phase_rotation()
         self.set_radiation_pattern()
         self.h = self.path_loss*self.phs_rot*self.radiat_ptn
-        print(self.radiat_ptn)
-        print()
-        print()
     
     def set_w(self):
         for usr in range(self.usr_n):

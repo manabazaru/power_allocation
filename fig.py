@@ -14,29 +14,16 @@ def plt_all_users(xy_arr):
     plt.scatter(xy_arr[:,0], xy_arr[:,1])
     plt.show()
 
-def make_SNR_interference_SINR_figure(usr_list, snr_arr, intf_arr, sinr_arr, fig_title):
-    med_list = [[], [], []]
-    std_list = [[], [], []]
-    for i in range(len(usr_list)):
-        for arr_idx, arr in enumerate([snr_arr, intf_arr, sinr_arr]):
-            arr_ele = arr[i]
-            length = len(arr_ele)
-            if length%2 == 0 and length != 0:
-                med = (arr_ele[length//2]+arr_ele[length//2+1]) / 2
-            else:
-                med = arr_ele[length//2]
-            std = np.std(arr_ele)
-            med_list[arr_idx].append(med)
-            std_list[arr_idx].append(std)
+def make_SNR_interference_SINR_figure(usr_list, snr_med, snr_std, i_med, i_std, sinr_med, sinr_std, fig_title):
     plt.style.use('default')
     sns.set()
     sns.set_style('whitegrid')
     sns.set_palette('Set1')
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.errorbar(usr_list, med_list[0], yerr=std_list[0], marker='o', label='SNR', capthick=1, capsize=8, lw=1)
-    ax.errorbar(usr_list, med_list[1], yerr=std_list[1], marker='o', label='I', capthick=1, capsize=8, lw=1)
-    ax.errorbar(usr_list, med_list[2], yerr=std_list[2], marker='o', label='SINR', capthick=1, capsize=8, lw=1)
+    ax.errorbar(usr_list, snr_med, yerr=snr_std, marker='o', label='SNR', capthick=1, capsize=8, lw=1)
+    ax.errorbar(usr_list, i_med, yerr=i_std, marker='o', label='I', capthick=1, capsize=8, lw=1)
+    ax.errorbar(usr_list, sinr_med, yerr=sinr_std, marker='o', label='SINR', capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('SNR/SINR/I')
     plt.show()

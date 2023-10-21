@@ -219,11 +219,11 @@ class RUS(Grouping):
 
     def execute(self):
         aranged_arr = np.arange(self.usr_n, dtype=int)
-        np.random.shuffle(aranged_arr)
         self.group_table = aranged_arr.reshape([self.group_n,
                                                 self.usrs_per_group])
         self.set_min_ad_all()
         self.set_sorted_min_ad_list()
+
 
 
 class MRangeAUS(Grouping):
@@ -570,6 +570,7 @@ class ASUSwithSampling(Grouping):
         self.rand_grp_num = param.random_group_n
         self.rand_add_grp_n = param.random_add_group_n
         self.sample_n = param.sample_user_n
+        self.usrs_per_group = eqpt.get_users_per_group()
         self.add = 0
         self.mult = 0
         self.comp = 0
@@ -581,7 +582,7 @@ class ASUSwithSampling(Grouping):
         iter_arr = np.arange(self.usr_n, dtype=int)
         usr_arr =  np.random.choice(iter_arr, self.sample_n, replace=False)
         sample_angs = self.eqpt.get_angs(usr_arr)
-        sample_eqpt = AUSEquipment(sample_angs)
+        sample_eqpt = AUSEquipment(sample_angs, self.usrs_per_group)
         aus = AUS(sample_eqpt)
         aus.execute()
         l_lim = aus.sorted_min_ad_list[1,0]
@@ -761,6 +762,7 @@ class ASUSwithSampling2(Grouping):
         self.rand_add_grp_n = param.random_add_group_n
         self.sample_n = param.sample_user_n
         self.ad_table = np.ones([self.usr_n, self.usr_n])*-1
+        self.usrs_per_group = eqpt.get_users_per_group()
         self.add = 0
         self.mult = 0
         self.comp = 0
@@ -790,7 +792,7 @@ class ASUSwithSampling2(Grouping):
         iter_arr = np.arange(self.usr_n, dtype=int)
         usr_arr =  np.random.choice(iter_arr, self.sample_n, replace=False)
         sample_angs = self.eqpt.get_angs(usr_arr)
-        sample_eqpt = AUSEquipment(sample_angs)
+        sample_eqpt = AUSEquipment(sample_angs, self.usrs_per_group)
         aus = AUS(sample_eqpt)
         aus.execute()
         l_lim = aus.sorted_min_ad_list[1,0]
