@@ -26,19 +26,25 @@ class GroupEvaluator():
     
     def set_SINR(self):
         pwr_per_usr = self.trans_pwr/self.usr_n
+        sum_sig = 0
         for usr in range(self.usr_n):
             hu = self.h[usr]
             wu = self.w[:,usr]
-            sig = abs(sum(hu*wu))**2 * pwr_per_usr
+            sig = abs(np.vdot(hu,wu))**2 * pwr_per_usr
+            # sig = abs(sum(hu*wu))**2 * pwr_per_usr
+            sum_sig+=sig
             intf = 0
             for usr2 in range(self.usr_n):
                 if usr == usr2:
                     continue
                 wi = self.w[:,usr2]
-                intf += abs(sum(hu*wi))**2 * pwr_per_usr
+                intf += abs(np.vdot(hu,wi))**2 * pwr_per_usr
+                # intf += abs(sum(hu*wi))**2 * pwr_per_usr
             self.interference[usr] = intf
             self.snr[usr] = sig / self.noise
             self.sinr[usr] = sig / (intf + self.noise)
+            print(f"sig: {sig}    intf:{intf}    noise:{self.noise}")
+        # print(sum_sig/self.usr_n)
     
     def set_sum_capacity(self):
         sum_cap = 0

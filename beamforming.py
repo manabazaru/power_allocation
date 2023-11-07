@@ -44,7 +44,7 @@ class BeamForming():
         gain_db = self.trans_gain + radiat + self.rcv_gain
         gain = 10**(gain_db/10)
         return gain
-    
+
     def set_radiation_pattern(self):
         for usr in range(self.usr_n):
             for ant in range(self.ant_n):
@@ -88,9 +88,10 @@ class ZeroForcing(BeamForming):
     def set_w(self):
         hherm = self.herm_transpose(self.h)
         h_hherm = np.dot(self.h, hherm)
-        w_unnorm = np.dot(hherm, (np.linalg.inv(h_hherm)))
+        w_unnorm = np.dot(hherm, np.linalg.inv(h_hherm))
         for usr in range(self.usr_n):
-            w_usr_sum = np.sqrt(sum(abs(w_unnorm[:,usr])**2))
+            w_usr_sum = sum(abs(w_unnorm[:,usr]))
+            #w_usr_sum = np.sqrt(sum(abs(w_unnorm[:,usr]**2)))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
 
 

@@ -14,7 +14,24 @@ def plt_all_users(xy_arr):
     plt.scatter(xy_arr[:,0], xy_arr[:,1])
     plt.show()
 
-def make_SNR_interference_SINR_figure(usr_list, snr_med, snr_std, i_med, i_std, sinr_med, sinr_std, fig_title):
+def save_plt_all_users(xy_arr, fig_title):
+    fig = plt.figure()
+    plt.scatter(xy_arr[:,0], xy_arr[:,1])
+    plt.show()
+    save.save_fig(fig, fig_title)
+
+def save_plt_users_with_colorbar(xy_arr, fig_title, c_arr, r):
+    fig = plt.figure()
+    plt.scatter(xy_arr[:,0], xy_arr[:,1], c=c_arr, cmap='jet')
+    plt.xlim(-r, r)
+    plt.ylim(-r, r)
+    # カラーバーを表示
+    plt.colorbar(ticks=np.arange(0, 1, 0.1))
+    plt.clim(0, 1.0)
+    # plt.show()
+    save.save_fig(fig, fig_title)
+
+def make_SNR_SINR_figure(usr_list, snr_med, snr_std, sinr_med, sinr_std, fig_title):
     plt.style.use('default')
     sns.set()
     sns.set_style('whitegrid')
@@ -22,10 +39,26 @@ def make_SNR_interference_SINR_figure(usr_list, snr_med, snr_std, i_med, i_std, 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.errorbar(usr_list, snr_med, yerr=snr_std, marker='o', label='SNR', capthick=1, capsize=8, lw=1)
-    ax.errorbar(usr_list, i_med, yerr=i_std, marker='o', label='I', capthick=1, capsize=8, lw=1)
     ax.errorbar(usr_list, sinr_med, yerr=sinr_std, marker='o', label='SINR', capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
-    ax.set_ylabel('SNR/SINR/I')
+    ax.set_ylabel('median SNR/SINR')
+    ax.legend()
+    plt.show()
+    save.save_fig(fig, fig_title)
+
+def make_interference_figure(usr_list, i_med, i_std, i_max, i_min, fig_title):
+    plt.style.use('default')
+    sns.set()
+    sns.set_style('whitegrid')
+    sns.set_palette('Set1')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(usr_list, i_max, marker='o', label='interference_max')
+    ax.plot(usr_list, i_min, marker='o', label='interference_min')
+    ax.errorbar(usr_list, i_med, yerr=i_std, marker='o', label='interference_median', capthick=1, capsize=8, lw=1)
+    ax.set_xlabel('number of users in a group')
+    ax.set_ylabel('Interference (log10)')
+    fig.legend()
     plt.show()
     save.save_fig(fig, fig_title)
 
@@ -33,7 +66,7 @@ def make_capacity_fig_with_std(usr_list, capacity_list, fig_title):
     med_list = []
     std_list = []
     for i in range(len(usr_list)):
-        capacity_arr = capacity_list[i]
+        capacity_arr = capacity_list[i] / 10**9
         med = statistics.median(capacity_arr)
         std = np.std(capacity_arr)
         med_list.append(med)
@@ -44,7 +77,7 @@ def make_capacity_fig_with_std(usr_list, capacity_list, fig_title):
     sns.set_palette('Set1')
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.errorbar(usr_list, med_list, yerr=std_list, marker='o', label='SNR', capthick=1, capsize=8, lw=1)
+    ax.errorbar(usr_list, med_list, yerr=std_list, marker='o', label='capacity', capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('capacity [Gbps]')
     plt.show()
@@ -89,7 +122,6 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, save_flg):
     plt.rcParams['ytick.right'] = True
     # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
     plt.legend()
-    plt.title(fig_title, y=-0.15)
     plt.xlim(fp.x_lim)
     plt.ylim(fp.y_lim)
     plt.xlabel(fp.x_label, fontsize=fp.fontsize, fontname="MS Gothic")

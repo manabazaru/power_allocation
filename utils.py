@@ -202,3 +202,9 @@ def xy2ang(xy_arr, z):
     angr = xyz2angr(xyz)
     ang = angr2ang(angr)
     return ang
+
+def ang2xy(ang_arr, z):
+    angr = ang2angr_with_z(ang_arr, z)
+    xyz = angr2xyz(angr)
+    xy = xyz2xy(xyz)
+    return xy
