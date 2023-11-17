@@ -14,6 +14,8 @@ class Property:
     sinr_path = './data/csv/SINR/sinr_'
     snr_path = './data/csv/SNR/snr_'
     intf_path = './data/csv/interference/intf_'
+    sig_path = './data/csv/signal/sig_'
+    noise_path = './data/csv/noise/ns_'
     minAD_path = './data/csv/minAD/minAD_'
     flop_path = './data/csv/flop/flop_'
     group_path = {'AUS'       : './data/csv/group/AUS/grp_',

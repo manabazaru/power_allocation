@@ -15,9 +15,9 @@ class FigProperty:
     cumulative_figure_size = (7,6)
     marker = ['k-.', 'b--', 'g-', 'r:', 'c-', 'm--', 'y-.', 'r-']
     gbps = 1.0 * 10**9
-    x_label = 'capacity [Gbps]'
-    y_label = 'cumulative distribution'
-    x_lim = [1, 1.6]
+    x_label = '通信路容量の合計値 [Gbps]'
+    y_label = '累積分布'
+    x_lim = [0, 3]
     y_lim = [0, 1]
     x_range = 0.2
     y_range = 0.1

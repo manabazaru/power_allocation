@@ -68,6 +68,16 @@ def save_interference_arr(intf_arr, ds_type):
     save_csv(intf_arr, path)
     print(f'[INFO SAVE] Interference of each {ds_type} user group is saved in {path}')
 
+def save_sig_arr(intf_arr, ds_type):
+    path = prop.sig_path + ds_type + '.csv'
+    save_csv(intf_arr, path)
+    print(f'[INFO SAVE] Signal of each {ds_type} user group is saved in {path}')
+
+def save_noise_arr(intf_arr, ds_type):
+    path = prop.noise_path + ds_type + '.csv'
+    save_csv(intf_arr, path)
+    print(f'[INFO SAVE] Noise of each {ds_type} user group is saved in {path}')
+
 def save_minAD_arr(minAD_arr, ds_type):
     path = prop.minAD_path + ds_type + '.csv'
     save_csv(minAD_arr, path)

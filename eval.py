@@ -17,6 +17,7 @@ class GroupEvaluator():
         self.noise_pwr_dens = param.noise_power_density
         self.sinr = np.zeros(self.usr_n)
         self.sum_capacity = 0
+        self.sig_arr = np.zeros(self.usr_n)
         self.set_all()
     
     def set_noise(self):
@@ -26,25 +27,23 @@ class GroupEvaluator():
     
     def set_SINR(self):
         pwr_per_usr = self.trans_pwr/self.usr_n
-        sum_sig = 0
         for usr in range(self.usr_n):
             hu = self.h[usr]
             wu = self.w[:,usr]
-            sig = abs(np.vdot(hu,wu))**2 * pwr_per_usr
-            # sig = abs(sum(hu*wu))**2 * pwr_per_usr
-            sum_sig+=sig
+            sig = abs(sum(hu*wu))**2 * pwr_per_usr
             intf = 0
             for usr2 in range(self.usr_n):
                 if usr == usr2:
                     continue
                 wi = self.w[:,usr2]
-                intf += abs(np.vdot(hu,wi))**2 * pwr_per_usr
-                # intf += abs(sum(hu*wi))**2 * pwr_per_usr
+                intf += abs(sum(hu*wi))**2 * pwr_per_usr
             self.interference[usr] = intf
             self.snr[usr] = sig / self.noise
             self.sinr[usr] = sig / (intf + self.noise)
-            print(f"sig: {sig}    intf:{intf}    noise:{self.noise}")
-        # print(sum_sig/self.usr_n)
+            self.sig_arr[usr] = sig
+            huhu = np.sqrt(sum(hu*np.conjugate(hu)))
+            # print(f"h_abs: {huhu}, d_arr: {self.bf.d_arr[usr]}")
+            # print(f"{usr}:: sig: {sig}   intf:{intf}  ||hu||:{huhu} d_arr:{self.bf.d_arr[usr,0]}")
     
     def set_sum_capacity(self):
         sum_cap = 0
@@ -72,7 +71,13 @@ class GroupEvaluator():
     
     def get_SNR(self):
         return self.snr
-
+    
+    def get_signal_pwr(self):
+        return self.sig_arr
+    
+    def get_noise(self):
+        return self.noise
+    
 class SystemEvaluator():
     def __init__(self, group_table, sorted_min_ad_arr, usr_ant_angr_arr):
         self.group_table = group_table
@@ -141,3 +146,24 @@ class SystemEvaluator():
             intf_arr[head:head+usr_n] = eval.get_interference()
             head += usr_n
         return intf_arr
+    
+    def get_signal_pwr(self):
+        sig_arr = np.zeros(self.usr_n)
+        head = 0
+        for eval_iter in range(len(self.eval_list)):
+            eval = self.eval_list[eval_iter]
+            usr_n = eval.get_user_n()
+            sig_arr[head:head+usr_n] = eval.get_signal_pwr()
+            head += usr_n
+        return sig_arr
+    
+    def get_noise_pwr(self):
+        noise_arr = np.zeros(self.usr_n)
+        head = 0
+        for eval_iter in range(len(self.eval_list)):
+            eval = self.eval_list[eval_iter]
+            usr_n = eval.get_user_n()
+            noise = eval.get_noise()
+            noise_arr[head:head+usr_n] += noise
+            head += usr_n
+        return noise_arr

@@ -95,6 +95,20 @@ def load_interference(ds_type):
     data_arr = data_arr if data_arr is None else data_arr.astype(float)
     return data_arr
 
+def load_noise(ds_type):
+    d_name = f'Noise of {ds_type}'
+    path = prop.noise_path + ds_type + '.csv'
+    data_arr = load_csv(path, d_name)
+    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    return data_arr
+
+def load_sig(ds_type):
+    d_name = f'Signal of {ds_type}'
+    path = prop.sig_path + ds_type + '.csv'
+    data_arr = load_csv(path, d_name)
+    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    return data_arr
+
 def load_minAD(ds_type):
     d_name = f'SINR of {ds_type}'
     path = prop.minAD_path + ds_type + '.csv'

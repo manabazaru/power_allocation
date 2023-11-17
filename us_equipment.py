@@ -129,8 +129,8 @@ class AUSEquipment():
         rm_usr_n = usr_n % self.usrs_per_group
         if rm_usr_n == 0:
             return np.array([])
-        group_size = int(usr_n/rm_usr_n)
-        rm_usr_arr = np.array([i for i in range(0,usr_n,group_size)])
+        group_size = int(usr_n/self.usrs_per_group)
+        rm_usr_arr = np.array([i*group_size for i in range(0,rm_usr_n)])
         return rm_usr_arr
 
     def get_usr_iter_orig(self, usr):

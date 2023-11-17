@@ -22,55 +22,148 @@ import os
 path.set_cur_dir()
 np.set_printoptions(threshold=np.inf)
 
-def test_AUS(usr_n, usrs_per_group):
+def test_AUS(usr_n, usrs_per_group, radius):
     start = 0
-    end = 50
+    end = usr_n // usrs_per_group -1
     filename = 'AUS' + '_random'
-    xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, 100)
+    xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
     ang_arr = utils.xy2ang(xy_arr, -param.z)
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     aus = grouping.AUS(eqpt)
+    start_time = time.time()
     aus.execute()
-    aus.print_group_info(start, 49)
+    end_time = time.time()
+    aus.print_group_info(start, end)
+    print(f"Calculation time: {end_time-start_time}")
     group_table = aus.get_group_table()
     sorted_min_ad_arr = aus.get_sorted_min_ad_list()
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
-    save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
+    # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
     cap_list = ev.get_sum_cap_arr()
-    print(cap_list)
-    save.save_eval_arr(cap_list, filename)
+    print(np.average((ev.get_SNR())))
+    # save.save_eval_arr(cap_list, filename)
     fig.make_cumulative_figures(np.array([cap_list]), ['AUS'], "fig_for_20231026", True)
-test_AUS(1200, 12)
+
+def test_AUS2(city, usrs_per_group):
+    ang_arr = load.load_angle(city)
+    filename = f'AUS_{city}_usrs_per_group={usrs_per_group}'
+    eqpt = AUSEquipment(ang_arr, usrs_per_group)
+    usr_n = eqpt.get_usr_n()
+    start = 0
+    end = 20
+    aus = grouping.AUS(eqpt)
+    aus.execute()
+    aus.print_group_info(start, end)
+    group_table = aus.get_group_table()
+    sorted_min_ad_arr = aus.get_sorted_min_ad_list()
+    haps = chaps()
+    usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
+    ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+    cap_list = ev.get_sum_cap_arr()
+    save.save_eval_arr(cap_list, filename)
+
+def test_RUS(city, usrs_per_group):
+    ang_arr = load.load_angle(city)
+    filename = f'RUS_{city}_usrs_per_group={usrs_per_group}'
+    eqpt = AUSEquipment(ang_arr, usrs_per_group)
+    usr_n = eqpt.get_usr_n()
+    start = 0
+    end = 20
+    aus = grouping.RUS(eqpt)
+    aus.execute()
+    aus.print_group_info(start, end)
+    group_table = aus.get_group_table()
+    sorted_min_ad_arr = aus.get_sorted_min_ad_list()
+    haps = chaps()
+    usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
+    ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+    cap_list = ev.get_sum_cap_arr()
+    save.save_eval_arr(cap_list, filename)
+    # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
+
+# test_AUS(1200, 12, 100)
+# test_RUS(1200, 12, 100)
+
+def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
+    start = 0
+    end = usr_n//usrs_per_group-1
+    xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
+    ang_arr = utils.xy2ang(xy_arr, -param.z)
+    eqpt = AUSEquipment(ang_arr, usrs_per_group)
+    mrus = grouping.MRangeAUS(eqpt, M)
+    start_time = time.time()
+    mrus.execute()
+    end_time = time.time()
+    mrus.print_group_info(start, end)
+    print(f"Calculation time: {end_time-start_time}")
+    group_table = mrus.get_group_table()
+    sorted_min_ad_arr = mrus.get_sorted_min_ad_list()
+    haps = chaps()
+    usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    # save.save_user_HAPS_angle(usr_ant_angr, 'cylinder', city)
+    ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+    cap_list = ev.get_sum_cap_arr()
+    # save.save_eval_arr(cap_list, filename)
+    # save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
+
+# test_MRUS_with_random(12000, 1200, 20, 4)
 
 def test_MRUS(city, M, usrs_per_group):
     start = 0
-    end = 50
-    filename = 'MRUS' + city + '_' + str(M)
+    end = 20
+    filename = 'MRUS_' + city + '_usrs_per_group=' + str(usrs_per_group) + '_' + str(M)
     ang_arr = load.load_angle(city)
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     mrus = grouping.MRangeAUS(eqpt, M)
     mrus.execute()
     mrus.print_group_info(start, end)
+    mrus.printadave()
     group_table = mrus.get_group_table()
     sorted_min_ad_arr = mrus.get_sorted_min_ad_list()
-    haps = phaps()
+    haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     save.save_user_HAPS_angle(usr_ant_angr, 'planar', city)
     ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
     cap_list = ev.get_sum_cap_arr()
     save.save_eval_arr(cap_list, filename)
-    save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
+    # save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
+
+def print_MRUS_flop(usr_n_list, m_val_list, group_n, r):
+    m_size = len(m_val_list)
+    rlt_list = [[] for i in range(m_size+1)]
+    for usr_n in usr_n_list:
+        usrs_per_group = int(usr_n/group_n)
+        filename = f"random_user={usr_n}_r={r}_1"
+        ang_arr = load.load_angle(filename)
+        eqpt = AUSEquipment(ang_arr, usrs_per_group)
+        for m_idx in range(m_size):
+            m = m_val_list[m_idx]
+            mrus = grouping.MRangeAUS(eqpt, m)
+            flop_list = mrus.get_flop_list()
+            rlt_list[m_idx].append(int(flop_list[-1]))
+        aus = grouping.AUS(eqpt)
+        aus.execute()
+        flop_list = aus.get_flop_list()
+        rlt_list[-1].append(int(flop_list[-1]))
+    rlt_arr = np.array(rlt_list)
+    print(rlt_arr)
+    save.save_flop_arr(rlt_arr, 'test_MRUS_AUS')
+# print_MRUS_flop([1800, 3600, 5400, 7200], [3,4,5], 100, 20)
 
 def make_eval_fig(city, m_val_list):
     ds_types = []
+    ds_types.append('RUS_' + city)
     ds_types.append('AUS_' + city)
     ds_types.extend(['MRUS_'+city+'_'+str(i) for i in m_val_list])
     eval_arr_list = []
     label_list = []
+    label_list.append('RUS')
     label_list.append('AUS')
-    label_list.extend(['m='+str(i) for i in m_val_list])
+    label_list.extend([f'ACUS (M={str(i)})' for i in m_val_list])
     # label_list.append('AUS')
     title = 'system_capacity_' + city
     for ds_type in ds_types:
@@ -242,13 +335,185 @@ def generate_user_distribution_of_max_min_interference(usr_n_list,
                                              group_intf_arr,
                                              radius)
 
-usr_list = [5*i for i in range(1,21)]
-rep = 50
-r = 20
+# for interference/signal/noise figure reported on 2023/11/12
+def generate_interference_signal_noise_figure_with_dif_usr(usr_n_list, rep, radius, x_label, y_label, 
+                                                                  fig_title):
+    usr_type_n = len(usr_n_list)
+
+    sig_med_std_list = np.zeros([usr_type_n, 2])
+    i_med_std_list = np.zeros([usr_type_n, 2])
+    ns_med_std_list = np.zeros([usr_type_n, 2])
+    for usr_type_idx, usrs_per_group in enumerate(usr_n_list):
+        usr_n = usrs_per_group * rep
+        filename = f'random_user={usr_n}_r={radius}'
+        # ang_arr = load.load_angle(filename)
+        # if ang_arr is None:
+        xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
+        ang_arr = utils.xy2ang(xy_arr, -param.z)
+        save.save_angle_arr(ang_arr, filename)
+        eqpt = AUSEquipment(ang_arr, usrs_per_group)
+        rus = grouping.RUS(eqpt)
+        rus.execute()
+        group_table = rus.get_group_table()
+        sorted_min_ad_arr = rus.get_sorted_min_ad_list()
+        haps = chaps()
+        usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+        ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+        sig = ev.get_signal_pwr()
+        intf = ev.get_interference()
+        ns = ev.get_noise_pwr()
+        save.save_group_table(group_table, 'no_grouping', filename)
+        save.save_sig_arr(sig, filename)
+        save.save_interference_arr(intf, filename)
+        save.save_noise_arr(ns, filename)
+        """else:
+            sig = load.load_sig(filename)
+            ns = load.load_noise(filename)
+            intf = load.load_interference(filename)"""
+        sig = 10*np.log10(sig*1000)
+        ns = 10*np.log10(ns*1000)
+        intf = 10*np.log10(intf*1000)
+        sig_med_std_list[usr_type_idx] = np.array([statistics.median(sig), 
+                                                  np.std(sig)])
+        ns_med_std_list[usr_type_idx] = np.array([statistics.median(ns), 
+                                                  np.std(ns)])
+        i_med_std_list[usr_type_idx] = np.array([statistics.median(intf), 
+                                                 np.std(intf)])
+    fig.make_sig_intf_noise_figure(usr_n_list, 
+                             sig_med_std_list[:,0],
+                             sig_med_std_list[:,1],
+                             i_med_std_list[:,0],
+                             i_med_std_list[:,1],
+                             ns_med_std_list[:,0],
+                             ns_med_std_list[:,1],
+                             x_label, y_label, fig_title)
+
+
+# for interference/signal/noise figure for different distance reported on 2023/11/12
+def generate_interference_signal_noise_figure_with_dif_r(r_list, rep, usrs_per_group, x_label, y_label, 
+                                                                  fig_title):
+    r_list_n = len(r_list)
+    sig_med_std_list = np.zeros([r_list_n, 2])
+    i_med_std_list = np.zeros([r_list_n, 2])
+    ns_med_std_list = np.zeros([r_list_n, 2])
+    for r_idx, r in enumerate(r_list):
+        usr_n = usrs_per_group * rep
+        filename = f'random_user={usr_n}_r={r}'
+        ang_arr = load.load_angle(filename)
+        # if ang_arr is None:
+        xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, r)
+        ang_arr = utils.xy2ang(xy_arr, -param.z)
+        save.save_angle_arr(ang_arr, filename)
+        eqpt = AUSEquipment(ang_arr, usrs_per_group)
+        rus = grouping.RUS(eqpt)
+        rus.execute()
+        group_table = rus.get_group_table()
+        sorted_min_ad_arr = rus.get_sorted_min_ad_list()
+        haps = chaps()
+        usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+        ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+        sig = ev.get_signal_pwr()
+        intf = ev.get_interference()
+        ns = ev.get_noise_pwr()
+        save.save_group_table(group_table, 'no_grouping', filename)
+        save.save_sig_arr(sig, filename)
+        save.save_interference_arr(intf, filename)
+        save.save_noise_arr(ns, filename)
+        # else:
+            #sig = load.load_sig(filename)
+            #ns = load.load_noise(filename)
+            #intf = load.load_interference(filename)
+        sig = 10*np.log10(sig*1000)
+        ns = 10*np.log10(ns*1000)
+        intf = 10*np.log10(intf*1000)
+        sig_med_std_list[r_idx] = np.array([statistics.median(sig), 
+                                                  np.std(sig)])
+        ns_med_std_list[r_idx] = np.array([statistics.median(ns), 
+                                                  np.std(ns)])
+        i_med_std_list[r_idx] = np.array([statistics.median(intf), 
+                                                 np.std(intf)])
+    r_log10_list = np.log10(np.array(r_list))
+    fig.make_sig_intf_noise_figure(r_log10_list, 
+                             sig_med_std_list[:,0],
+                             sig_med_std_list[:,1],
+                             i_med_std_list[:,0],
+                             i_med_std_list[:,1],
+                             ns_med_std_list[:,0],
+                             ns_med_std_list[:,1],
+                             x_label, y_label, fig_title)
+
+# for interference/signal/noise figure for different distance reported on 2023/11/12
+def test_of_dif_r(r_list, rep, usrs_per_group, x_label, y_label, fig_title):
+    r_list_n = len(r_list)
+    sig_med_std_list = np.zeros([r_list_n, 2])
+    i_med_std_list = np.zeros([r_list_n, 2])
+    ns_med_std_list = np.zeros([r_list_n, 2])
+    one_ang = np.pi*2/usrs_per_group
+    xy_arr_unit = np.array([[np.cos(i*one_ang), np.sin(i*one_ang)] for i in range(usrs_per_group)])
+    for r_idx, r in enumerate(r_list):
+        usr_n = usrs_per_group * rep
+        filename = f'random_user={usr_n}_r={r}'
+        ang_arr = load.load_angle(filename)
+        # if ang_arr is None:
+        xy_arr = xy_arr_unit * r
+        # xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, r)
+        ang_arr = utils.xy2ang(xy_arr, -param.z)
+        save.save_angle_arr(ang_arr, filename)
+        eqpt = AUSEquipment(ang_arr, usrs_per_group)
+        rus = grouping.RUS(eqpt)
+        rus.execute()
+        group_table = rus.get_group_table()
+        sorted_min_ad_arr = rus.get_sorted_min_ad_list()
+        haps = phaps()
+        usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+        ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
+        sig = ev.get_signal_pwr()
+        intf = ev.get_interference()
+        ns = ev.get_noise_pwr()
+        save.save_group_table(group_table, 'no_grouping', filename)
+        save.save_sig_arr(sig, filename)
+        save.save_interference_arr(intf, filename)
+        save.save_noise_arr(ns, filename)
+        # else:
+            #sig = load.load_sig(filename)
+            #ns = load.load_noise(filename)
+            #intf = load.load_interference(filename)
+        sig = 10*np.log10(sig*1000)
+        ns = 10*np.log10(ns*1000)
+        intf = 10*np.log10(intf*1000)
+        sig_med_std_list[r_idx] = np.array([statistics.median(sig), 
+                                                  np.std(sig)])
+        ns_med_std_list[r_idx] = np.array([statistics.median(ns), 
+                                                  np.std(ns)])
+        i_med_std_list[r_idx] = np.array([statistics.median(intf), 
+                                                 np.std(intf)])
+    r_log10_list = np.log10(np.array(r_list))
+    fig.make_sig_intf_noise_figure(r_log10_list, 
+                             sig_med_std_list[:,0],
+                             sig_med_std_list[:,1],
+                             i_med_std_list[:,0],
+                             i_med_std_list[:,1],
+                             ns_med_std_list[:,0],
+                             ns_med_std_list[:,1],
+                             x_label, y_label, fig_title)
+
+
+usr_list = [10*i for i in range(1,26)]
+r_list = [10**i for i in range(-3, 5)]
+rep = 10
+r = 100
+users_per_group = 2
+style = 'median'
+
 
 cap_title = f'cap_fig_user={usr_list[0]}~{usr_list[-1]}_radius={r}_rep={rep}'
 sn_title = f'sn_fig_user={usr_list[0]}~{usr_list[-1]}_radius={r}_rep={rep}'
 intf_title = f'intf_fig_user={usr_list[0]}~{usr_list[-1]}_radius={r}_rep={rep}'
+sin_title_dif_usr = f'({style}_sin_fig_user={usr_list[0]}~{usr_list[-1]}_radius={r}_rep={rep}'
+sin_title_dif_r = f'{style}_sin_fig_user={users_per_group}_radius={r_list[0]}~{r_list[-1]}_rep={rep}'
 # generate_interference_SNR_SINR_figure_with_random_users(usr_list, 50, 20, cap_title, sn_title, intf_title)
 
 # generate_user_distribution_of_max_min_interference(usr_list, rep, r, 'no_grouping')
+# generate_interference_signal_noise_figure_with_dif_r(r_list, rep, users_per_group, 'log_10(L[km])', 'median dBm', sin_title_dif_r)
+# generate_interference_signal_noise_figure_with_dif_usr(usr_list, rep, r, 'users per group', 'median dBm', sin_title_dif_usr)
+# test_of_dif_r(r_list, rep, users_per_group, 'log_10(L[km])', 'median dBm', 'test_' + sin_title_dif_r)

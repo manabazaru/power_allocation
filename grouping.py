@@ -97,6 +97,10 @@ class Grouping():
         start = 0
         end = self.group_n-1
         self.print_group_info(start, end)
+    
+    def printadave(self):
+        average = np.average(self.min_ad_arr)
+        print(average)
 
 class NoGrouping(Grouping):
     def __init__(self, eqpt: AUSEquipment):

@@ -46,6 +46,22 @@ def make_SNR_SINR_figure(usr_list, snr_med, snr_std, sinr_med, sinr_std, fig_tit
     plt.show()
     save.save_fig(fig, fig_title)
 
+def make_sig_intf_noise_figure(x_list, sig_med, sig_std, intf_med, intf_std, ns_med, ns_std,
+                               x_label, y_label, fig_title):
+    plt.style.use("default")
+    sns.set()
+    sns.set_palette('Set1')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.errorbar(x_list, intf_med, intf_std, marker='o', label='interference', capthick=1, capsize=8, lw=1)
+    ax.errorbar(x_list, sig_med, sig_std, marker='o', label='signal', capthick=1, capsize=8, lw=1)
+    ax.errorbar(x_list, ns_med, ns_std, marker='o', label='noise', capthick=1, capsize=8, lw=1)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.legend()
+    plt.show()
+    save.save_fig(fig, fig_title)
+
 def make_interference_figure(usr_list, i_med, i_std, i_max, i_min, fig_title):
     plt.style.use('default')
     sns.set()
