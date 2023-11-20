@@ -18,6 +18,9 @@ class Property:
     noise_path = './data/csv/noise/ns_'
     minAD_path = './data/csv/minAD/minAD_'
     flop_path = './data/csv/flop/flop_'
+    group_path = './data/csv/group/grp_'
+    usr_ant_path = './data/csv/HAPS/ua_'
+    
     group_path = {'AUS'       : './data/csv/group/AUS/grp_',
                   'azimuth_US': './data/csv/group/azimuth/grp_',
                   'SMUS'      : './data/csv/group/SMUS/grp_',

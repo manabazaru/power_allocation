@@ -48,7 +48,7 @@ def test_AUS(usr_n, usrs_per_group, radius):
 
 def test_AUS2(city, usrs_per_group):
     ang_arr = load.load_angle(city)
-    filename = f'AUS_{city}_usrs_per_group={usrs_per_group}'
+    filename = f'AUS_planar_{city}_usrs_per_group={usrs_per_group}'
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     usr_n = eqpt.get_usr_n()
     start = 0
@@ -58,7 +58,7 @@ def test_AUS2(city, usrs_per_group):
     aus.print_group_info(start, end)
     group_table = aus.get_group_table()
     sorted_min_ad_arr = aus.get_sorted_min_ad_list()
-    haps = chaps()
+    haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
@@ -67,7 +67,7 @@ def test_AUS2(city, usrs_per_group):
 
 def test_RUS(city, usrs_per_group):
     ang_arr = load.load_angle(city)
-    filename = f'RUS_{city}_usrs_per_group={usrs_per_group}'
+    filename = f'RUS_planar_{city}_usrs_per_group={usrs_per_group}'
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     usr_n = eqpt.get_usr_n()
     start = 0
@@ -77,7 +77,7 @@ def test_RUS(city, usrs_per_group):
     aus.print_group_info(start, end)
     group_table = aus.get_group_table()
     sorted_min_ad_arr = aus.get_sorted_min_ad_list()
-    haps = chaps()
+    haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
@@ -115,7 +115,7 @@ def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
 def test_MRUS(city, M, usrs_per_group):
     start = 0
     end = 20
-    filename = 'MRUS_' + city + '_usrs_per_group=' + str(usrs_per_group) + '_' + str(M)
+    filename = 'MRUS_planar_' + city + '_usrs_per_group=' + str(usrs_per_group) + '_' + str(M)
     ang_arr = load.load_angle(city)
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     mrus = grouping.MRangeAUS(eqpt, M)
@@ -124,7 +124,7 @@ def test_MRUS(city, M, usrs_per_group):
     mrus.printadave()
     group_table = mrus.get_group_table()
     sorted_min_ad_arr = mrus.get_sorted_min_ad_list()
-    haps = chaps()
+    haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     save.save_user_HAPS_angle(usr_ant_angr, 'planar', city)
     ev = eval(group_table, sorted_min_ad_arr, usr_ant_angr)
@@ -170,6 +170,23 @@ def make_eval_fig(city, m_val_list):
         eval_arr = load.load_eval(ds_type)
         eval_arr_list.append(eval_arr)
     figure = fig.make_cumulative_figures(eval_arr_list, label_list, title, True)
+
+
+for usr_per_group in range(10, 200, 10):    
+    for m in range(3,6):
+        title = f'planar_tokyo_usrs_per_group={usr_per_group}'
+        city = 'tokyo'
+        test_MRUS(city, m, usr_per_group)
+    test_AUS2(city, usr_per_group)
+    test_RUS(city, usr_per_group)
+    print(f"Now showing the situation of tokyo whose usrs_per_group={usr_per_group}")
+    make_eval_fig(title, [3,4,5])
+
+"""
+for usr_per_group in range(10, 60, 10):
+    title = f'tokyo_usrs_per_group={usr_per_group}'
+    make_eval_fig(title, [3,4,5])
+"""
 
 def make_minAD_fig(city, m_val_list, usrs_per_group):
     title = 'minAD_' + city

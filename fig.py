@@ -145,7 +145,7 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, save_flg):
     plt.xticks(np.arange(fp.x_lim[0], fp.x_lim[1]+fp.x_range, fp.x_range))
     plt.yticks(np.arange(fp.y_lim[0], fp.y_lim[1]+fp.y_range, fp.y_range))
     plt.grid()
-    plt.show()
+    # plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)
 
