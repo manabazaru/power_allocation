@@ -6,6 +6,7 @@ import grouping
 import fig
 from haps import CyrindricalHAPS as chaps
 from haps import PlanarHAPS as phaps
+import haps
 from beamforming import BeamForming, ZeroForcing
 from eval import SystemEvaluator as eval
 from us_equipment import AUSEquipment
@@ -13,6 +14,111 @@ from properties import Property as prop
 from parameters import Parameter as param
 import numpy as np
 import rand_uni
+
+class Dataset():
+    def __init__(self, typ, nuk, nu, nt, r, z, shp, DSidx):
+        self.typ = typ
+        self.nuk = nuk
+        self.nu = nu
+        self.nt = nt
+        self.r = r
+        self.z = z
+        self.shp = shp
+        self.dsi = DSidx
+        self.xy_tag = ''
+        self.ang_tag = ''
+        self.ua_tag = ''
+        self.setup_tag()
+        self.y_arr = None
+        self.ang_arr = None
+        self.eqpt = None
+        self.ua_angr_arr = None
+        self.setup_usr_ang_arr()
+    
+    def setup_tag(self):
+        self.xy_tag = f'typ={self.typ}_NuK={self.nuk}_' + \
+                      f'r={self.r}_DSidx={self.dsi}'
+        self.ang_tag = f'typ={self.typ}_NuK={self.nuk}_r={self.r}_' + \
+                       f'z={self.z}_DSidx={self.dsi}'
+        self.ua_tag = f'typ={self.typ}_NuK={self.nuk}_Nu={self.nu}_Nt={self.nt}_' + \
+                      f'r={self.r}_z={self.z}_shp={self.shp}_DSidx={self.dsi}'
+
+    def setup_xy(self):
+        try:
+            self.xy_arr = load.load_xy(self.xy_tag)
+        except FileNotFoundError:
+            if self.typ in prop.cities:
+                city = self.typ + '_' + {self.r}
+                self.xy_arr = load.load_mat(city)
+            elif self.typ is 'random':
+                self.xy_arr = rand_uni.generate_random_uniform_usr_xy(self.nuk, self.r)
+            else:
+                raise Exception('[INFO ERROR] There is an error in setup_xy(): '+\
+                                'Invalid type to create xy array is entered.')
+            save.save_xy_arr(self.xy_arr, self.xy_tag)
+    
+    def setup_ang(self):
+        try:
+            self.ang_arr = load.load_angle(self.ang_tag)
+        except FileNotFoundError:
+            self.setup_xy()
+            self.ang_arr = utils.xy2ang(self.xy_arr, -self.z)
+            save.save_angle_arr(self.ang_arr, self.ang_tag)
+    
+    def setup_eqpt(self):
+        if self.ang_arr is None:
+            self.setup_ang()
+        self.eqpt = AUSEquipment(self.ang_arr, self.nu)
+    
+    def setup_usr_ang_arr(self):
+        try:
+            self.ua_angr_arr = load.load_usr_haps_angle(self.ua_tag)
+        except FileNotFoundError:
+            self.setup_eqpt()
+            self.ua_angr_arr = haps.get_user_antenna_angle_r_arr(self.shp, self.eqpt)
+            save.save_user_HAPS_angle(self.ua_angr_arr, self.ua_tag)
+
+
+class Simulation():
+    def __init__(self, ds: Dataset, alg, SIMidx):
+        self.typ = ds.typ
+        self.nuk = ds.nuk
+        self.nu = ds.nu
+        self.nt = ds.nt
+        self.r = ds.r
+        self.z = ds.z
+        self.shp = ds.shp
+        self.alg = alg
+        self.dsi = ds.dsi
+        self.simi = SIMidx
+        self.grp_tag = ''
+        self.eval_tag = ''
+        self.sig_tag = ''
+        self.intf_tag = ''
+        self.noise_tag = ''
+        self.sinr_tag = ''
+        self.flop_tag = ''
+        self.grp_mAD_tag = ''
+        self.usr_mAD_tag = ''
+        self.setup()
+    
+    def setup(self):
+        tag1 = f'typ={self.typ}_NuK={self.nuk}_Nu={self.nu}_' + \
+               f'r={self.r}_z={self.z}_alg={self.alg}_' + \
+               f'DSidx={self.dsi}_SIMidx={self.simi}'
+        tag2 = f'typ={self.typ}_NuK={self.nuk}_Nu={self.nu}_' + \
+               f'Nt={self.nt}_r={self.r}_z={self.z}_shp={self.shp}_'+\
+               f'alg={self.alg}_DSidx={self.dsi}_SIMidx={self.simi}'
+        tag3 = f'typ={self.typ}_NuK={self.nuk}_Nu={self.nu}_' + \
+               f'Nt={self.nt}_r={self.r}_z={self.z}_'+\
+               f'alg={self.alg}_DSidx={self.dsi}_SIMidx={self.simi}'
+        self.grp_tag = self.grp_mAD_tag = self.usr_mAD_tag = tag1
+        self.eval_tag = self.sig_tag = self.intf_tag = \
+                        self.noise_tag = self.sinr_tag = tag2
+        self.flop_tag = tag3
+    
+
+
 
 def save_city_csv(city):
     xy_arr = load.load_mat(city)

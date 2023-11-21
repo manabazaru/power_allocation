@@ -27,7 +27,7 @@ def save_xy_arr(xy_arr, ds_type):
     print(f'[INFO SAVE] User xy array of {ds_type} is saved in {path}')
 
 def save_group_table(group_table, alg, ds_type):
-    path = prop.group_path[alg] + '_' + alg + '_' + ds_type + '.csv'
+    path = prop.group_path + ds_type + '.csv'
     save_csv(group_table, path)
     print(f'[INFO SAVE] Group table of {ds_type} users with generating {alg} is saved in {path}')
 
@@ -42,11 +42,12 @@ def save_eval_arr(eval_arr, ds_type):
     print(f'[INFO SAVE] Evaluation of each {ds_type} user group is saved in {path}')
 
 # incomplete
-def save_user_HAPS_angle(usr_ant_ang_arr, haps_shape, ds_type):
-    path = prop.usr_ant_path[haps_shape] + haps_shape + '_' + ds_type + '.csv'
-    save_csv(usr_ant_ang_arr, path)
-    print(f'[INFO SAVE] Angles between users of {ds_type} and antenna elements of ' +
-          f'{haps_shape} HAPS is saved in {path}')
+def save_user_HAPS_angle(usr_ant_ang_arr, ds_type):
+    for i in range(3):
+        path = prop.usr_ant_path[i] + ds_type + '.csv'
+        arr = usr_ant_ang_arr[:,:,i]
+        save_csv(arr, path)
+        print(f'[INFO SAVE] Angles between users of {ds_type}  is saved in {path}')
     
 def save_fig(fig, fig_name):
     path = prop.fig_path + fig_name + '.png'
@@ -78,10 +79,15 @@ def save_noise_arr(intf_arr, ds_type):
     save_csv(intf_arr, path)
     print(f'[INFO SAVE] Noise of each {ds_type} user group is saved in {path}')
 
-def save_minAD_arr(minAD_arr, ds_type):
-    path = prop.minAD_path + ds_type + '.csv'
+def save_group_minAD_arr(minAD_arr, ds_type):
+    path = prop.group_minAD_path + ds_type + '.csv'
     save_csv(minAD_arr, path)
-    print(f'[INFO SAVE] SINR of each {ds_type} user group is saved in {path}')
+    print(f'[INFO SAVE] MinAD of each {ds_type} group is saved in {path}')
+
+def save_user_minAD_arr(minAD_arr, ds_type):
+    path = prop.usr_minAD_path + ds_type + '.csv'
+    save_csv(minAD_arr, path)
+    print(f'[INFO SAVE] MinAD of each {ds_type} user group is saved in {path}')
 
 def save_flop_arr(flop_arr, ds_type):
     path = prop.flop_path + ds_type + '.csv'
@@ -93,4 +99,3 @@ def save_flop_arrs(flop_arrs, ds_type):
     save_csv(flop_arrs, path)
     arr_n = len(flop_arrs)
     print(f'[INFO SAVE] {arr_n} flops data of {ds_type} is saved in {path}')
-

@@ -3,8 +3,11 @@ import simulation as sim
 
 def main():
     path.set_cur_dir()
-    #sim.save_AUS_flops(3, [3600], [int(i) for i in range(1, 11)], 20)
-    sim.save_MRUS_flops(3, [1800, 3600], [int(i) for i in range(1, 11)], 20, [3])
+    r = 20
+    z = 20
+    typ_list = ['sendai', 'tokyo', 'nagoya', 'osaka']
+    for typ in typ_list:
+        ds = sim.Dataset(typ, )
 
 if __name__=='__main__':
     main()

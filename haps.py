@@ -140,3 +140,12 @@ class CyrindricalHAPS(HAPS):
                 usr_btm_angr[usr, btm_ant] = rot_angr
         usr_ant_angr = np.concatenate([usr_sd_angr, usr_btm_angr],1)
         return usr_ant_angr
+
+def get_user_antenna_angle_r_arr(shp, eqpt: AUSEquipment):
+    if shp == 'p':
+        haps = PlanarHAPS()
+        ua_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    elif shp == 'c':
+        haps = CyrindricalHAPS()
+        ua_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    return ua_angr

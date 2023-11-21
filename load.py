@@ -3,14 +3,10 @@ import csv
 import scipy.io as scio
 from properties import Property as prop
 
-def load_csv(path, data_name):
-    try:
-        with open(path, 'r') as f:
-            reader = csv.reader(f)
-            load_list = [row for row in reader]
-    except FileNotFoundError:
-        print(f'[INFO ERROR] {data_name} could not be loaded from {path}')
-        return
+def load_csv(path):
+    with open(path, 'r') as f:
+        reader = csv.reader(f)
+        load_list = [row for row in reader]
     data_arr = np.array(load_list)
     factor_n = data_arr.shape[1]
     if factor_n == 1:
@@ -28,97 +24,74 @@ def load_mat(city):
     return usr_xy
 
 def load_angle(ds_type):
-    d_name = f'User angle of {ds_type}'
     path = prop.angle_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_xy(ds_type):
-    d_name = f'User xy of {ds_type}'
     path = prop.xy_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_group_table(ds_type, alg):
-    d_name = f'Group table of {ds_type} with {alg}'
-    path = prop.group_path[alg] + '_' + alg + '_' + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
-    data_arr = data_arr.astype(int)
+    path = prop.group_path + ds_type + '.csv'
+    data_arr = load_csv(path).astype(int)
     return data_arr
 
 def load_eval(ds_type):
-    d_name = f'Evaluation of {ds_type}'
     path = prop.eval_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_closest_user(ds_type):
-    d_name = f'Closest user data of {ds_type}'
     path = prop.cls_usr_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
-    data_arr = data_arr.astype(int)
+    data_arr = load_csv(path).astype(int)
     return data_arr
 
-# incomplete
-def load_usr_haps_angle(ds_type, haps_shape):
-    d_name = f'Angles between users of {ds_type} and antenna '+ \
-             f'elements of {haps_shape} HAPS'
-    path = prop.usr_ant_path[haps_shape] + haps_shape + '_' + \
-           ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+def load_usr_haps_angle(ds_type):
+    for i in range(3):
+        path = prop.usr_ant_path[i] + ds_type + '.csv'
+        arr = load_csv(path).astype(float)
+        if i==0:
+            row = len(arr)
+            col = len(arr[:])
+            data_arr = np.zeros([row, col, 3], dtype=float)
+            data_arr[:,:,0] = arr
+        else:
+            data_arr[:,:,i] = arr
     return data_arr
 
 def load_sinr(ds_type):
-    d_name = f'SINR of {ds_type}'
     path = prop.sinr_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_snr(ds_type):
-    d_name = f'SNR of {ds_type}'
     path = prop.snr_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_interference(ds_type):
-    d_name = f'Interference of {ds_type}'
     path = prop.intf_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_noise(ds_type):
-    d_name = f'Noise of {ds_type}'
     path = prop.noise_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_sig(ds_type):
-    d_name = f'Signal of {ds_type}'
     path = prop.sig_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_minAD(ds_type):
-    d_name = f'SINR of {ds_type}'
     path = prop.minAD_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
 
 def load_flop(ds_type):
-    d_name = f'Flop of {ds_type}'
     path = prop.flop_path + ds_type + '.csv'
-    data_arr = load_csv(path, d_name)
-    data_arr = data_arr if data_arr is None else data_arr.astype(float)
+    data_arr = load_csv(path).astype(float)
     return data_arr
