@@ -191,7 +191,7 @@ class AUS(Grouping):
         self.set_min_ad_all()
         self.set_sorted_min_ad_list()
         swapped = False
-        print("             Start swapping.")
+        print("             Start swapping ... ", end="")
         while True:
             self.c_out += 1
             group_worst = int(self.sorted_min_ad_list[0,0])
@@ -206,6 +206,7 @@ class AUS(Grouping):
                 swapped = False
             else:
                 break
+        print("complete!")
 
     def calc_add_flops(self):
         flops = 3/2 * self.usr_n * (self.usr_n-1)
@@ -330,7 +331,7 @@ class MRangeAUS(Grouping):
         self.init_group_table()
         print("[INFO MRUS] MRUS algorithm has been executed.")
         print("            Now calculating  [", end="")
-        load_period = int(self.usr_n/self.M/10)
+        load_period = int(self.usr_n/40)
         load_ratio = load_period
         while self.u_head < self.usr_n:
             if self.u_head > load_ratio:

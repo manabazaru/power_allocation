@@ -18,9 +18,9 @@ class Property:
     usr_minAD_path = './data/csv/user_minAD/usrmAD_'
     flop_path = './data/csv/flop/flop_'
     group_path = './data/csv/group/grp_'
-    usr_ant_path = ['./data/csv/HAPS/azimuth/uaaz_',
-                    './data/csv/HAPS/elevation/uael_',
-                    './data/csv/HAPS/radius/uar_']
+    usr_ant_path = ['./data/csv/user_antenna_location/azimuth/uaaz_',
+                    './data/csv/user_antenna_location/elevation/uael_',
+                    './data/csv/user_antenna_location/radius/uar_']
     mat_path = {'sendai_20': './data/mat/sendai_20km_scale_0.005_date_20210129.mat',
                 'tokyo_20' : './data/mat/tokyo_20km_scale_0.0005_date_20210129.mat',
                 'yagami_20': './data/mat/yagami_20km_scale_0.0005_date_20210129.mat',

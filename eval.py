@@ -3,13 +3,13 @@ from beamforming import BeamForming, ZeroForcing
 import numpy as np
 
 class GroupEvaluator():
-    def __init__(self, bf: BeamForming):
+    def __init__(self, bf: BeamForming, trans_pwr):
         self.bf = bf
         self.usr_n = bf.get_usr_n()
         self.h = bf.get_h()
         self.w = bf.get_w()
         self.bandwidth = param.bandwidth
-        self.trans_pwr = param.trans_pwr
+        self.trans_pwr = trans_pwr
         self.noise_fig = param.noise_figure
         self.noise = 0
         self.snr = np.zeros(self.usr_n)
@@ -79,9 +79,10 @@ class GroupEvaluator():
         return self.noise
     
 class SystemEvaluator():
-    def __init__(self, group_table, usr_ant_angr_arr):
+    def __init__(self, group_table, usr_ant_angr_arr, trans_pwr):
         self.group_table = group_table
         self.angr_arr = usr_ant_angr_arr
+        self.trans_pwr = trans_pwr
         self.group_n = len(group_table)
         self.usr_n = 0
         self.eval_list = [-1 for i in range(self.group_n)]
@@ -89,24 +90,40 @@ class SystemEvaluator():
         self.set_all()
     
     def set_eval_list(self):
+        print("[INFO EVAL] Initialization of Beamforming matrices is started.")
+        print("            Now initializing  [", end="")
+        load_period = int(self.group_n/20)
+        load_ratio = load_period
         for group in range(self.group_n):
+            if group >= load_ratio:
+                print("=",end="")
+                load_ratio += load_period
             mems = self.group_table[group]
             group_angr_arr = self.angr_arr[mems]
             bf = ZeroForcing(group_angr_arr)
-            ev = GroupEvaluator(bf)
+            ev = GroupEvaluator(bf, self.trans_pwr)
             self.eval_list[group] = ev
-    
+        print(">] 100 %")
+
     def set_usr_n(self):
         for group in range(self.group_n):
             eval = self.eval_list[group]
             self.usr_n += eval.get_user_n()            
         
     def set_sum_cap_arr(self):
+        print("[INFO EVAL] Calculation of sum capacities is started.")
+        print("            Now calculating  [", end="")
+        load_period = int(self.group_n/20)
+        load_ratio = load_period
         for group in range(self.group_n):
             if -1 in self.eval_list:
                 print("[INFO ERROR] Variable <eval_list> has not been set.")
+            if group >= load_ratio:
+                print("=",end="")
+                load_ratio += load_period
             sum_cap = self.eval_list[group].get_sum_capacity()
             self.sum_cap_arr[group] = sum_cap
+        print(">] 100 %")
     
     def set_all(self):
         self.set_eval_list()

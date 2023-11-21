@@ -8,6 +8,7 @@ def generate_random_uniform_usr_xy(size, com_r):
     x = com_r_arr*np.cos(az_rad)
     y = com_r_arr*np.sin(az_rad)
     xy_arr = np.array([x,y]).T
+    print(f"[INFO RANDUNI] Generating random uniform xy_arr (r={com_r}, size={size})")
     return xy_arr
 
 def generate_usr_xy1(size, com_r, index):

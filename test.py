@@ -39,7 +39,7 @@ def test_AUS(usr_n, usrs_per_group, radius):
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
-    ev = eval(group_table, usr_ant_angr)
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
     print(np.average((ev.get_SNR())))
     # save.save_eval_arr(cap_list, filename)
@@ -59,7 +59,7 @@ def test_AUS2(city, usrs_per_group):
     haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
-    ev = eval(group_table, usr_ant_angr)
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
     save.save_eval_arr(cap_list, filename)
 
@@ -77,10 +77,31 @@ def test_RUS(city, usrs_per_group):
     haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
-    ev = eval(group_table, usr_ant_angr)
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
     save.save_eval_arr(cap_list, filename)
     # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
+
+def test_RUS_with_random(usr_n, radius, usrs_per_group):
+    xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
+    ang_arr = utils.xy2ang(xy_arr, -param.z)
+    filename = f'RUS_planar_{city}_usrs_per_group={usrs_per_group}'
+    eqpt = AUSEquipment(ang_arr, usrs_per_group)
+    usr_n = eqpt.get_usr_n()
+    start = 0
+    end = 20
+    aus = grouping.RUS(eqpt)
+    aus.execute()
+    aus.print_group_info(start, end)
+    group_table = aus.get_group_table()
+    haps = phaps()
+    usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
+    cap_list = ev.get_sum_cap_arr()
+    save.save_eval_arr(cap_list, filename)
+    # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
+
 
 # test_AUS(1200, 12, 100)
 # test_RUS(1200, 12, 100)
@@ -88,6 +109,7 @@ def test_RUS(city, usrs_per_group):
 def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
     start = 0
     end = usr_n//usrs_per_group-1
+    filename = 'MRUS_planar_random_usrs_per_group=' + str(usrs_per_group) + '_' + str(M)
     xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
     ang_arr = utils.xy2ang(xy_arr, -param.z)
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
@@ -101,9 +123,9 @@ def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylinder', city)
-    ev = eval(group_table, usr_ant_angr)
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
-    # save.save_eval_arr(cap_list, filename)
+    save.save_eval_arr(cap_list, filename)
     # save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
 
 # test_MRUS_with_random(12000, 1200, 20, 4)
@@ -122,7 +144,7 @@ def test_MRUS(city, M, usrs_per_group):
     haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     save.save_user_HAPS_angle(usr_ant_angr, 'planar', city)
-    ev = eval(group_table, usr_ant_angr)
+    ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
     save.save_eval_arr(cap_list, filename)
     # save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
@@ -167,9 +189,9 @@ def make_eval_fig(city, m_val_list):
     figure = fig.make_cumulative_figures(eval_arr_list, label_list, title, True)
 
 
-for usr_per_group in range(10, 200, 10):    
+for usr_per_group in range(12, 40, 12):    
     for m in range(3,6):
-        title = f'planar_tokyo_usrs_per_group={usr_per_group}'
+        title = f'planar_random_usrs_per_group={usr_per_group}'
         city = 'tokyo'
         test_MRUS(city, m, usr_per_group)
     test_AUS2(city, usr_per_group)
@@ -248,7 +270,7 @@ def generate_interference_SNR_SINR_figure_with_random_users(usr_n_list, rep, rad
             group_table = rus.get_group_table()
             haps = phaps()
             usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
-            ev = eval(group_table, usr_ant_angr)
+            ev = eval(group_table, usr_ant_angr, param.trans_pwr)
             cap_arr = ev.get_sum_cap_arr()
             save.save_eval_arr(cap_arr, filename)
             cap_list[usr_type_idx] = cap_arr
@@ -368,7 +390,7 @@ def generate_interference_signal_noise_figure_with_dif_usr(usr_n_list, rep, radi
         group_table = rus.get_group_table()
         haps = chaps()
         usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
-        ev = eval(group_table, usr_ant_angr)
+        ev = eval(group_table, usr_ant_angr, param.trans_pwr)
         sig = ev.get_signal_pwr()
         intf = ev.get_interference()
         ns = ev.get_noise_pwr()
@@ -420,7 +442,7 @@ def generate_interference_signal_noise_figure_with_dif_r(r_list, rep, usrs_per_g
         group_table = rus.get_group_table()
         haps = chaps()
         usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
-        ev = eval(group_table, usr_ant_angr)
+        ev = eval(group_table, usr_ant_angr, param.trans_pwr)
         sig = ev.get_signal_pwr()
         intf = ev.get_interference()
         ns = ev.get_noise_pwr()
@@ -474,7 +496,7 @@ def test_of_dif_r(r_list, rep, usrs_per_group, x_label, y_label, fig_title):
         group_table = rus.get_group_table()
         haps = phaps()
         usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
-        ev = eval(group_table, usr_ant_angr)
+        ev = eval(group_table, usr_ant_angr, param.trans_pwr)
         sig = ev.get_signal_pwr()
         intf = ev.get_interference()
         ns = ev.get_noise_pwr()
