@@ -26,10 +26,10 @@ def save_xy_arr(xy_arr, ds_type):
     save_csv(xy_arr, path)
     print(f'[INFO SAVE] User xy array of {ds_type} is saved in {path}')
 
-def save_group_table(group_table, alg, ds_type):
+def save_group_table(group_table, ds_type):
     path = prop.group_path + ds_type + '.csv'
     save_csv(group_table, path)
-    print(f'[INFO SAVE] Group table of {ds_type} users with generating {alg} is saved in {path}')
+    print(f'[INFO SAVE] Group table of {ds_type} is saved in {path}')
 
 def save_closest_user_arr(cls_usr_arr, ds_type):
     path = prop.cls_usr_path + ds_type + '.csv'

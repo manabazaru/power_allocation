@@ -149,3 +149,12 @@ def get_user_antenna_angle_r_arr(shp, eqpt: AUSEquipment):
         haps = CyrindricalHAPS()
         ua_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     return ua_angr
+
+def get_Nt(shp):
+    nt = 0
+    if shp == 'p':
+        nt = param.planar_antenna_size_of_side ** 2
+    elif shp == 'c':
+        sd_n = param.side_horizonal_antenna * param.side_vertical_antenna
+        nt = param.bottom_antenna + sd_n
+    return nt

@@ -67,6 +67,21 @@ class Grouping():
         az_list = np.stack([iter_arr, az_arr])
         self.sorted_az_list = az_list[:,np.argsort(az_list[1])]
     
+    def get_user_mAD_arr(self):
+        usr_mad_arr = np.zeros(self.usr_n, dtype=float)
+        for group in range(self.group_n):
+            mem_list = self.group_table[group]
+            for usr in mem_list:
+                mad = 100000000
+                for usr2 in mem_list:
+                    if usr == usr2:
+                        continue
+                    ad = self.calc_ad(usr, usr2)
+                    if mad > ad:
+                        mad = ad
+                usr_mad_arr[usr] = mad
+        return usr_mad_arr
+    
     def get_group_table(self):
         return self.group_table
     
@@ -97,6 +112,9 @@ class Grouping():
         start = 0
         end = self.group_n-1
         self.print_group_info(start, end)
+    
+    def get_flop_list(self):
+        return [0,0,0,0]
     
     def printadave(self):
         average = np.average(self.min_ad_arr)

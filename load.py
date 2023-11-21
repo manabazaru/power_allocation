@@ -86,8 +86,13 @@ def load_sig(ds_type):
     data_arr = load_csv(path).astype(float)
     return data_arr
 
-def load_minAD(ds_type):
-    path = prop.minAD_path + ds_type + '.csv'
+def load_group_minAD_arr(ds_type):
+    path = prop.group_minAD_path + ds_type + '.csv'
+    data_arr = load_csv(path).astype(float)
+    return data_arr
+
+def load_user_minAD_arr(ds_type):
+    path = prop.usr_minAD_path + ds_type + '.csv'
     data_arr = load_csv(path).astype(float)
     return data_arr
 

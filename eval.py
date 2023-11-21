@@ -79,14 +79,13 @@ class GroupEvaluator():
         return self.noise
     
 class SystemEvaluator():
-    def __init__(self, group_table, sorted_min_ad_arr, usr_ant_angr_arr):
+    def __init__(self, group_table, usr_ant_angr_arr):
         self.group_table = group_table
         self.angr_arr = usr_ant_angr_arr
         self.group_n = len(group_table)
         self.usr_n = 0
         self.eval_list = [-1 for i in range(self.group_n)]
         self.sum_cap_arr = np.zeros(self.group_n)
-        self.sorted_min_ad_arr = sorted_min_ad_arr
         self.set_all()
     
     def set_eval_list(self):
