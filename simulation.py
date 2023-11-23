@@ -10,6 +10,21 @@ from properties import Property as prop
 from parameters import Parameter as param
 import rand_uni
 import numpy as np
+import datetime
+
+class Log():
+    def __init__(self):
+        now = datetime.datetime.now()
+        self.date_string = f"{now.year}_{now.month}_{now.day}_" + \
+                      f"{now.hour}_{now.minute}_{now.second}"
+        self.log_string = ""
+    
+    def add_log_string(self, string):
+        self.log_string += string
+    
+    def save_log(self):
+        save.save_log(self.date_string, self.log_string)
+        
 
 class Dataset():
     def __init__(self, typ, nu, r, shp, DSidx):
@@ -21,19 +36,38 @@ class Dataset():
         self.z = param.z
         self.shp = shp
         self.dsi = DSidx  # index of dataset
-
         # tag for loading
         self.xy_tag = ''
         self.ang_tag = ''
         self.ua_tag = ''
-        
         # dataset
         self.xy_arr = None
         self.ang_arr = None
         self.eqpt = None
         self.ua_angr_arr = None
         self.setup_tag()
-    
+        # for log
+        self.string = ""
+        self.print_dataset_status()
+
+    # print dataset status on console and set it as string
+    def print_dataset_status(self):
+        black_mass = " " * 11
+        string_list =  [
+                        "\n[INFO DATA] Dataset object has been generated.",
+                        f"{black_mass} <settings>",
+                        f"{black_mass}  type : {self.typ}",
+                        f"{black_mass}  Nu   : {self.nu}",
+                        f"{black_mass}  Nt   : {self.nt}",
+                        f"{black_mass}  r    : {self.r}",
+                        f"{black_mass}  z    : {self.z}",
+                        f"{black_mass}  shp  : {self.shp}",
+                        f"{black_mass}  DSi  : {self.dsi}\n",
+                        ]
+        string = '\n'.join(string_list)
+        print(string)
+        self.string = string
+
     # set tag for loading (execute 1st)
     def setup_tag(self):
         self.xy_tag = f'typ={self.typ}_r={self.r}_DSidx={self.dsi}'
@@ -58,6 +92,8 @@ class Dataset():
                 raise Exception('[INFO ERROR] There is an error in setup_xy(): '+\
                                 'Invalid type to create xy array is entered.')
             save.save_xy_arr(self.xy_arr, self.xy_tag)
+            # for log
+            self.string += f"[INFO DATA] xy_arr has been saved.\n"
     
     # load or generate ang_arr
     def setup_ang(self):
@@ -71,6 +107,8 @@ class Dataset():
             self.ang_arr = utils.xy2ang(self.xy_arr, -self.z)
             # save
             save.save_angle_arr(self.ang_arr, self.ang_tag)
+            # for log
+            self.string += f"[INFO DATA] angle_arr has been saved.\n"
     
     # generate AUSEquipment
     def setup_eqpt(self):
@@ -90,6 +128,8 @@ class Dataset():
             self.ua_angr_arr = haps.get_user_antenna_angle_r_arr(self.shp, self.eqpt)
             # save
             save.save_user_HAPS_angle(self.ua_angr_arr, self.ua_tag)
+            # for log
+            self.string += f"[INFO DATA] ua_arr has been saved.\n"
     
     def get_xy(self):
         return self.xy_arr
@@ -118,8 +158,9 @@ class Simulation():
         self.alg = alg
         self.dsi = ds.dsi
         self.simi = SIMidx  # index of simulation
+        # for log
+        self.string = None
         self.print_simulation_status()
-
         # tag for loading
         self.grp_tag = ''
         self.grp_mAD_tag = ''
@@ -130,7 +171,6 @@ class Simulation():
         self.noise_tag = ''
         self.cap_tag = ''
         self.setup_tag()
-
         # simulation result
         self.group_table = None
         self.grp_mAD_arr = None
@@ -141,22 +181,26 @@ class Simulation():
         self.noise_arr = None
         self.cap_arr = None  # capacity list
     
+    # print simulation status on console and set it as string
     def print_simulation_status(self):
-        print()
-        blank_mass = " " * 10
-        print("[INFO SIM] Simulation has started.")
-        print(f"{blank_mass} <settings>")
-        print(f"{blank_mass} type : {self.typ}")
-        print(f"{blank_mass} Nu   : {self.nu}")
-        print(f"{blank_mass} Nt   : {self.nt}")
-        print(f"{blank_mass} r    : {self.r}")
-        print(f"{blank_mass} z    : {self.z}")
-        print(f"{blank_mass} shp  : {self.shp}")
-        print(f"{blank_mass} t_pwr: {self.t_pwr}")
-        print(f"{blank_mass} alg  : {self.alg}")
-        print(f"{blank_mass} DSi  : {self.dsi}")
-        print(f"{blank_mass} SIMi : {self.simi}")
-        print()
+        black_mass = " " * 10
+        string_list =  [
+                        "\n[INFO SIM] Simulation object has been generated.",
+                        f"{black_mass} <settings>",
+                        f"{black_mass}  type : {self.typ}",
+                        f"{black_mass}  Nu   : {self.nu}",
+                        f"{black_mass}  Nt   : {self.nt}",
+                        f"{black_mass}  r    : {self.r}",
+                        f"{black_mass}  z    : {self.z}",
+                        f"{black_mass}  shp  : {self.shp}",
+                        f"{black_mass}  t_pwr: {self.t_pwr}",
+                        f"{black_mass}  alg  : {self.alg}",
+                        f"{black_mass}  DSi  : {self.dsi}",
+                        f"{black_mass}  SIMi : {self.simi}\n"
+                        ]
+        string = '\n'.join(string_list)
+        print(string)
+        self.string = string
 
     # set tags for loading (execute 1st)
     def setup_tag(self):
@@ -201,14 +245,15 @@ class Simulation():
             self.grp_mAD_arr = grp.get_min_ad_arr()
             self.usr_mAD_arr = grp.get_user_mAD_arr()
             self.flop_arr = np.array(grp.get_flop_list())
-
             # save
             save.save_group_table(self.group_table, self.grp_tag)
             save.save_group_minAD_arr(self.grp_mAD_arr, self.grp_mAD_tag)
             save.save_user_minAD_arr(self.usr_mAD_arr, self.usr_mAD_tag)
             save.save_flop_arr(self.flop_arr, self.flop_tag)
-            
-    
+            # for log
+            self.string += f"[INFO SIM] Simulation data has been saved.\n"    
+
+
     # load or generate (self.sig_arr, self.intf_arr, self.noise_arr, self.cap_arr)
     def execute_all(self):
         try:
@@ -228,9 +273,10 @@ class Simulation():
             self.intf_arr = ev.get_interference()
             self.noise_arr = ev.get_noise_pwr()
             self.cap_arr = np.array(ev.get_sum_cap_arr())
-
             # save
             save.save_sig_arr(self.sig_arr, self.sig_tag)
             save.save_interference_arr(self.intf_arr, self.intf_tag)
             save.save_noise_arr(self.noise_arr, self.noise_tag)
             save.save_eval_arr(self.cap_arr, self.cap_tag)
+            # for log
+            self.string += f"[INFO SIM] Simulation data has been saved.\n"

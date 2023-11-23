@@ -9,6 +9,7 @@ class Property:
     cls_usr_path = './data/csv/closest_user/cls_'
     eval_path = './data/csv/eval/ev_'
     fig_path = './data/fig/'
+    log_path = './data/log/'
     sinr_path = './data/csv/SINR/sinr_'
     snr_path = './data/csv/SNR/snr_'
     intf_path = './data/csv/interference/intf_'
@@ -25,4 +26,6 @@ class Property:
                 'tokyo_20' : './data/mat/tokyo_20km_scale_0.0005_date_20210129.mat',
                 'yagami_20': './data/mat/yagami_20km_scale_0.0005_date_20210129.mat',
                 'nagoya_20': './data/mat/nagoya_20km_scale_0.005_date_20210129.mat',
-                'osaka_20' : './data/mat/osaka_20km_scale_0.0005_date_20210129.mat'}
+                'osaka_20' : './data/mat/osaka_20km_scale_0.0005_date_20210129.mat',
+                'tokyo_50' : './data/mat/20210129_0_533946113_50km_0.001_33271ue.mat',
+                'tokyo_100': './data/mat/20210129_0_533946113_100km_0.001_40878ue.mat'}

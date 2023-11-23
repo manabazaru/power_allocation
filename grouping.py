@@ -136,7 +136,7 @@ class AUS(Grouping):
         super().__init__(eqpt)
         self.alg_name = 'AUS'
         # ndarray(1): AD table. row_idx < col_idx blocks are unusable.
-        self.dif_table = np.zeros([self.usr_n, self.usr_n]) - 1
+        self.dif_table = np.zeros([self.usr_n, self.usr_n], dtype='float16') - 1
         self.swap_cnt = 0
         self.init_group_table(args)
         self.c_in = 0

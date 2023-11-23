@@ -1,7 +1,8 @@
 import csv
 import numpy as np
 from properties import Property as prop
-import matplotlib.pyplot as plt
+import os
+import logging
 
 def save_csv(data_arr, path):
     dim = data_arr.ndim
@@ -100,3 +101,14 @@ def save_flop_arrs(flop_arrs, ds_type):
     save_csv(flop_arrs, path)
     arr_n = len(flop_arrs)
     print(f'[INFO SAVE] data: flop_arrs, path: {path}')
+
+def save_log(date_string, log_string):
+    dir_path = prop.log_path + date_string + '/'
+    file_path = dir_path + 'sim.log'
+    os.mkdir(dir_path)
+    logger = logging.getLogger(date_string)
+    logger.setLevel(20)
+    fh = logging.FileHandler(file_path)
+    logger.addHandler(fh)
+    logger.log(20, log_string)
+    print(f'[INFO SAVE] data: log, path: {file_path}')
