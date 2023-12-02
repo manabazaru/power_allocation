@@ -20,14 +20,14 @@ def save_plt_all_users(xy_arr, fig_title):
     plt.show()
     save.save_fig(fig, fig_title)
 
-def save_plt_users_with_colorbar(xy_arr, fig_title, c_arr, r):
+def save_plt_users_with_colorbar(xy_arr, fig_title, c_arr, c_max, c_min, r):
     fig = plt.figure()
-    plt.scatter(xy_arr[:,0], xy_arr[:,1], c=c_arr, cmap='jet')
+    plt.scatter(xy_arr[:,0], xy_arr[:,1], s=10, c=c_arr, cmap='jet')
     plt.xlim(-r, r)
     plt.ylim(-r, r)
     # カラーバーを表示
-    plt.colorbar(ticks=np.arange(0, 1, 0.1))
-    plt.clim(0, 1.0)
+    plt.colorbar(ticks=np.arange(c_min, c_max, (c_max-c_min)/10))
+    plt.clim(c_min, c_max)
     # plt.show()
     save.save_fig(fig, fig_title)
 
@@ -45,6 +45,26 @@ def make_SNR_SINR_figure(usr_list, snr_med, snr_std, sinr_med, sinr_std, fig_tit
     ax.legend()
     plt.show()
     save.save_fig(fig, fig_title)
+
+def make_SINR_figure(nu_list, alg_list, sinr_dict, fig_title):
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    for alg in alg_list:
+        sinr_arr = sinr_dict[alg]
+        med_arr = np.zeros(len(nu_list))
+        std_arr = np.zeros(len(nu_list))
+        for nu_idx in range(len(nu_list)):
+            med = statistics.median(sinr_arr[nu_idx])
+            std = np.std(sinr_arr[nu_idx])
+            med_arr[nu_idx] = med
+            std_arr[nu_idx] = std
+        ax.errorbar(nu_list, med_arr, yerr=std_arr, marker='o', label=alg, capthick=1, capsize=8, lw=1)
+    ax.set_xlabel('number of users in a group')
+    ax.set_ylabel('SINR[dB]')
+    fig.legend()
+    plt.show()
+    save.save_fig(fig, fig_title)
+
 
 def make_sig_intf_noise_figure(x_list, sig_med, sig_std, intf_med, intf_std, ns_med, ns_std,
                                x_label, y_label, fig_title):
@@ -94,6 +114,37 @@ def make_capacity_fig_with_std(usr_list, capacity_list, fig_title):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.errorbar(usr_list, med_list, yerr=std_list, marker='o', label='capacity', capthick=1, capsize=8, lw=1)
+    ax.set_xlabel('number of users in a group')
+    ax.set_ylabel('capacity [Gbps]')
+    plt.show()
+    save.save_fig(fig, fig_title)
+
+def make_capacitys_fig_with_std(nu_list, cap_dict, alg_list, fig_title):
+    med_dict = {}
+    std_dict = {}
+    for alg in alg_list:
+        cap_arr = cap_dict[alg]
+        nu_size = len(cap_arr)
+        med_arr = np.zeros(nu_size)
+        std_arr = np.zeros(nu_size)
+        # calculate median and standard deviation of each nu dataset
+        for nu_idx in range(nu_size):
+            non_zero_arr = np.where(cap_arr[nu_idx]!=0)[0]
+            new_cap_arr = cap_arr[nu_idx, non_zero_arr]
+            med = statistics.median(new_cap_arr)
+            std = np.std(new_cap_arr)
+            med_arr[nu_idx] = med
+            std_arr[nu_idx] = std
+        med_dict[alg] = med_arr
+        std_dict[alg] = std_arr
+    plt.style.use('default')
+    sns.set()
+    sns.set_style('whitegrid')
+    sns.set_palette('Set1')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    for alg in alg_list:
+        ax.errorbar(nu_list, med_dict[alg], yerr=std_dict[alg], marker='o', label=alg, capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('capacity [Gbps]')
     plt.show()
@@ -205,11 +256,11 @@ def make_cumulative_minAD(minAD_arr_list, label_list, fig_title, save_flg):
     if save_flg:
         save.save_fig(fig, fig_title)
 
-def heatmap(block_population, fig_title, save_flg):
+def heatmap(r, block_population, fig_title, save_flg):
     print(block_population.shape)
     df = pd.DataFrame(block_population)
     fig, ax = plt.subplots(figsize=(8, 5))
-    im = ax.imshow(np.flipud(df.T), extent=(-20,20,-20,20), cmap='jet')
+    im = ax.imshow(np.flipud(df.T), extent=(-r,r,-r,r), cmap='jet')
     ax.set_xlabel('km')
     ax.set_ylabel('km')
     plt.colorbar(im, label='people/sq km')

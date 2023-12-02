@@ -93,32 +93,3 @@ class ZeroForcing(BeamForming):
             w_vec = w_unnorm[:,usr]
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
-        """
-        total_w_usr_sum = 0
-        absw_list = []        
-            absw_list.append(w_usr_sum)
-            total_w_usr_sum += w_usr_sum
-        hhhh = np.dot(self.h, w_unnorm)
-        abs_h = np.sqrt(self.h*np.conjugate(self.h))
-        abs_hhhh = np.sqrt(hhhh * np.conjugate(hhhh))
-        h1_h2 = self.h[0] * np.conjugate(self.h[1])
-        h1_unit = self.h[0] / np.sum(self.h[0]*np.conjugate(self.h[0]))**0.5
-        h2_unit = self.h[1] / np.sum(self.h[1]*np.conjugate(self.h[1]))**0.5
-        h1_h2_unit = h1_unit * np.conjugate(h2_unit)
-        inner_prct = np.sum(h1_h2_unit * np.conjugate(h1_h2_unit))
-        inner_prct2 = np.sum(h1_h2 * np.conjugate(h1_h2))
-        print(f"inner_product = {inner_prct}")
-        print(f"inner_product2 = {inner_prct2}")
-        print(f"absw_usr_sum: {absw_list}")
-        print(f"||g|| = {np.sum(self.radiat_ptn**2, 1)}")
-        print(f"||p|| = {np.sum(self.path_loss**2, 1)}")
-        print(f"||h|| = {np.sum(self.h*np.conjugate(self.h), 1)}")
-        abs_hhhh_arr = abs_hhhh.reshape(len(self.h)**2)
-        config_arr = np.zeros(50, dtype=int)
-        for num in abs_hhhh_arr:
-            if abs(num)==0:
-                continue
-            idx = -int((np.log10(num)))
-            config_arr[idx] += 1
-        print(config_arr)
-        """

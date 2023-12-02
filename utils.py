@@ -193,7 +193,7 @@ def get_heatmap_data_from_xy_arr(xy_arr, block_n, radius):
     scale = radius * 2 / block_n
     block_population = np.zeros([block_n, block_n], dtype=int)
     for xy in xy_arr:
-        block_indices = np.array((xy+20)//scale, dtype=int)
+        block_indices = np.array((xy+radius)//scale, dtype=int)
         block_population[block_indices[0], block_indices[1]] += 1
     return block_population
 

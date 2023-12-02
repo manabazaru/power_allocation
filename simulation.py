@@ -280,3 +280,27 @@ class Simulation():
             save.save_eval_arr(self.cap_arr, self.cap_tag)
             # for log
             self.string += f"[INFO SIM] Simulation data has been saved.\n"
+
+    def get_group_table(self):
+        return self.group_table
+    
+    def get_group_mAD_arr(self):
+        return self.grp_mAD_arr
+    
+    def get_user_mAD_arr(self):
+        return self.usr_mAD_arr
+    
+    def get_flop_arr(self):
+        return self.flop_arr
+    
+    def get_sig_arr(self):
+        return self.sig_arr
+    
+    def get_intf_arr(self):
+        return self.intf_arr
+    
+    def get_noise_arr(self):
+        return self.noise_arr
+    
+    def get_cap_arr(self):
+        return self.cap_arr
