@@ -115,7 +115,7 @@ def generate_nu_cap_figure_with_random(r, nu_list, grp_n_dict, shp, dsidx_list, 
                 tail = int((dsidx_idx+1)*grp_n)
                 cap_arr[nu_idx, head:tail] = np.array(sim.get_cap_arr())
         rlt_dict[alg] = cap_arr
-    fig.make_capacitys_fig_with_std(nu_list, rlt_dict, alg_list, f'capacitys_each_nu_r={r}_shp={shp}')
+    fig.make_capacitys_fig_with_std(nu_list, rlt_dict, alg_list, f'capacitys_each_nu_r={r}_shp={shp}_nt={param.planar_antenna_size_of_side**2}')
     
 def generate_nu_cap_figures_with_random(r_list, nu_list, grp_n_dict, shp_list, dsidx_list, t_pwr, alg_list, sim_idx_dict):
     for r in r_list:
@@ -156,31 +156,87 @@ def generate_sinr_figure_with_random(r, nu_list, grp_n_dict, shp, dsidx_list, t_
                 sig_arr = np.array(sim.get_sig_arr())
                 intf_arr = np.array(sim.get_intf_arr())
                 ns_arr = np.array(sim.get_noise_arr())
-                # sinr = 10*np.log10(sig_arr / (intf_arr+ns_arr))
-                sinr = sig_arr / (intf_arr+ns_arr)
+                sinr = 10*np.log10(sig_arr / (intf_arr+ns_arr))
+                # sinr = sig_arr / (intf_arr+ns_arr)
                 sinr_arr[head:tail] = sinr
-            sinrs_list[nu_idx] = np.log2(sinr_arr) * nu
+            sinrs_list[nu_idx] = sinr_arr
         rlt_dict[alg] = sinrs_list
-    fig.make_SINR_figure(nu_list, alg_list, rlt_dict, f'SINR_each_nu_r={r}_shp={shp}_alg={alg_list}_Nt={param.planar_antenna_size_of_side}')
+    fig.make_SINR_figure(nu_list, alg_list, rlt_dict, f'SINR(notdB)_each_nu_r={r}_shp={shp}_alg={alg_list}_Nt={param.planar_antenna_size_of_side}')
+
+# 2023/12/03
+def generate_cumulative_cap(typ, nu, r, shp, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
+    ds_size = len(dsidx_list)
+    ds_list = [None for i in range(ds_size)]
+    for i, dsidx in enumerate(dsidx_list):
+        ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+        ds_list[i] = ds
+    caps_list = []
+    for alg in alg_list:
+        cap_list = []
+        sim_idx = sim_idx_dict[alg]
+        for ds in ds_list:
+            sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+            sim.execute_all()
+            cap = sim.get_cap_arr()
+            cap_list.append(cap)
+        cap_arr = np.array(cap_list)
+        row, col = cap_arr.shape
+        new_cap_arr = cap_arr.reshape(row*col)
+        print(f"{alg}: {min(new_cap_arr)}")
+        caps_list.append(new_cap_arr)
+    fig.make_cumulative_figures(caps_list, alg_list, f'cumulative_capacity_r={r}_typ={typ}_shp={shp}_alg={alg_list}_nt={param.planar_antenna_size_of_side**2}', x_lim, x_range, True)
+
+def generate_flop_table(nu_list, grp_n, r, shp, dsidx, alg_list, t_pwr, sim_idx_dict):
+    ds_list = [None for i in range(len(nu_list))]
+    for nu_idx, nu in enumerate(nu_list):
+        ds = simulation.Dataset('random'+str(nu*grp_n), nu, r, shp, dsidx)
+        ds_list[nu_idx] = ds
+    data_list = []
+    row0 = ['']
+    row0.extend([f'Nu = {i}' for i in nu_list])
+    for alg in alg_list:
+        if 'ACUS' in alg: new_alg = f'ACUS (M = {alg[4:]})'
+        else: new_alg = alg
+        rowi = [new_alg]
+        sim_idx = sim_idx_dict[alg]
+        for ds in ds_list:
+            sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+            sim.execute_grouping()
+            flop = sim.get_flop_arr()
+            print(flop)
+            flop = int(flop[-1])
+            flop_str = '{:.3e}'.format(flop)
+            rowi.append(flop_str)
+        data_list.append(rowi)
+    data_arr = np.array(data_list)
+    fig.make_flop_table(data_arr, row0, f'flop_table_nu={nu_list}_r={r}_alg={alg_list}')
+
+        
+
 
 def execute():
     path.set_cur_dir()
     # generate_tokyo_heatmap()
-    alg_list =['ACUS3', 'ACUS6', 'AUS', 'RUS']
+    alg_list =['ACUS3']
     sim_idx_dict = {}
-    for alg in alg_list: sim_idx_dict[alg] = 0 
-    nu_list = [i for i in range(20, 200, 20)]
+    for alg in alg_list: sim_idx_dict[alg] = 0
+    # sim_idx_dict['RUS'] = 1 
+    nu_list = [i for i in range(10, 105, 10)]
     grp_dict = {}
     grp_n = 100
     for nu in nu_list:
         grp_dict[nu] = grp_n
-    generate_sinr_figure_with_random(20,
-                                     nu_list,
-                                     grp_dict,
-                                     'p',
-                                     [0,1],
-                                     120,
-                                     alg_list,
-                                     sim_idx_dict)
+    generate_sinr_figure_with_random(100, nu_list, grp_dict, 'c', [0,1], 120, alg_list, sim_idx_dict)
+    generate_nu_cap_figures_with_random([100], nu_list, grp_dict, 'c', [0,1], 120, alg_list, sim_idx_dict)
+    x_lim_list = [[3, 4], [4, 10], [0, 0.01]]
+    x_range_list = [0.2, 0.5, 0.001]
+    for nu_idx, nu in enumerate(nu_list):
+        typ = 'random'+str(nu*grp_n)
+        # generate_cumulative_cap(typ, 100, 20, 'p', [i for i in range(4)], alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
+    cities = ['tokyo', 'sendai', 'nagoya', 'osaka']
+    # generate_flop_table([20, 40, 60, 80], 100, 20, 'p', 0, alg_list, 120, sim_idx_dict)
+    # for city in cities:
+        # generate_cumulative_cap(city, 20, 20, 'p', [0], alg_list, 120, sim_idx_dict, [0, 5], 0.2)
 
+    
 execute()

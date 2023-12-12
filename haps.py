@@ -158,3 +158,88 @@ def get_Nt(shp):
         sd_n = param.side_horizonal_antenna * param.side_vertical_antenna
         nt = param.bottom_antenna + sd_n
     return nt
+
+
+class CyrindricalSideHAPS(HAPS):
+    def __init__(self):
+        super().__init__()
+        # number of each antenna element
+        self.sd_h_n = param.side_horizonal_antenna
+        self.sd_v_n = param.side_vertical_antenna
+        self.sd_n = self.sd_h_n * self.sd_v_n
+        self.ant_n = self.sd_n
+        # side antenna element
+        self.sd_xyz_arr = np.zeros([self.sd_v_n, self.sd_h_n, 3])
+        self.sd_vec_dir = np.zeros([self.sd_v_n, self.sd_h_n])
+        # length
+        self.h_r = 0.6 * self.wv_len * (self.sd_h_n / (2*np.pi))
+        self.dv = 0.6 * self.wv_len
+        self.ant_height = param.antenna_height
+        self.set_all()
+
+    def set_side_antenna_vector_direction(self):
+        vec_ang_dif = 360/self.sd_h_n
+        dir_arr = np.arange(self.sd_h_n)*vec_ang_dif - 180
+        for v in range(self.sd_v_n):
+            self.sd_vec_dir[v,:] = dir_arr[:]
+
+    def set_antenna_xyz_arr(self):
+        z = (self.sd_v_n-1) * self.dv / 2
+        # set side antenna
+        for v in range(self.sd_v_n):
+            dir_rad = np.deg2rad(self.sd_vec_dir[v])
+            x = self.h_r * np.cos(dir_rad)
+            y = self.h_r * np.sin(dir_rad)
+            self.sd_xyz_arr[v,:,0] = x
+            self.sd_xyz_arr[v,:,1] = y
+            self.sd_xyz_arr[v,:,2] = z
+            z -= self.dv
+
+    def set_all(self):
+        print("[INFO HAPS] Initialization of HAPS has been started.")
+        self.set_side_antenna_vector_direction()
+        self.set_antenna_xyz_arr()
+ 
+    def get_user_antenna_angle_r_arr(self, eqpt: AUSEquipment):
+        print("[INFO HAPS] Calculation of user angle from each antenna "+
+              "element has been started.")
+        ang_arr = eqpt.get_ang_all()
+        usr_n = eqpt.get_usr_n()
+        usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude)
+        usr_xyz_arr = utils.angr2xyz(usr_angr_arr)
+        usr_sd_angr = np.zeros([usr_n, self.sd_n, 3])
+        usr_ant_angr = np.zeros([usr_n, self.ant_n, 3])
+        flt_sd_xyz_arr = self.sd_xyz_arr.reshape(self.sd_n,3)
+        flt_sd_vec_dir = self.sd_vec_dir.reshape(self.sd_n)
+        for usr in tqdm.tqdm(range(usr_n)):
+            usr_xyz = usr_xyz_arr[usr]
+            for sd_ant in range(self.sd_n):
+                sd_xyz = flt_sd_xyz_arr[sd_ant]
+                shift_usr_xyz = usr_xyz - sd_xyz
+                shift_usr_angr = utils.xyz2angr(shift_usr_xyz)
+                shift_usr_angr[0] = utils.calc_az_dif(shift_usr_angr[0],
+                                                      flt_sd_vec_dir[sd_ant])
+                usr_sd_angr[usr, sd_ant] = shift_usr_angr
+        usr_ant_angr = usr_sd_angr
+        return usr_ant_angr
+
+def get_user_antenna_angle_r_arr(shp, eqpt: AUSEquipment):
+    if shp == 'p':
+        haps = PlanarHAPS()
+    elif shp == 'c':
+        haps = CyrindricalHAPS()
+    elif shp == 'cs':
+        haps = CyrindricalSideHAPS()
+    ua_angr = haps.get_user_antenna_angle_r_arr(eqpt)
+    return ua_angr
+
+def get_Nt(shp):
+    nt = 0
+    if shp == 'p':
+        nt = param.planar_antenna_size_of_side ** 2
+    elif shp == 'c':
+        sd_n = param.side_horizonal_antenna * param.side_vertical_antenna
+        nt = param.bottom_antenna + sd_n
+    elif shp == 'cs':
+        nt = param.side_horizonal_antenna * param.side_vertical_antenna
+    return nt

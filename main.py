@@ -1,6 +1,6 @@
 import path
 import simulation
-
+ 
 def main():
     # settings
     path.set_cur_dir()
@@ -9,20 +9,18 @@ def main():
     #############################################################################################
     # simulation parameters
     r_list = [20]
-    nu_list = [i for i in range(20, 200, 20)]
+    nu_list = [i for i in range(5, 105, 5)]
     nu_typ_loop = True
-    typ_list = ["random"+str(i*100) for i in nu_list]
+    typ_list = ['random'+str(i*100) for i in nu_list]
+    dsidx_size = 2
     shp_list = ['p']
-    DSidx_dict = {'random2400':[i for i in range(2)], 'random1200':[i for i in range(10)], 
-                  'random3600':[i for i in range(10)], 'random4800':[i for i in range(10)],
-                  'random6000':[i for i in range(10)], 'random7200':[i for i in range(10)],
-                  'random6300':[i for i in range(2)],
-                  'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}
-    for typ in typ_list:
-        DSidx_dict[typ] = [0,1]
     t_pwr_list = [120]
-    alg_list = ['ACUS3', 'ACUS6', 'AUS', 'RUS']
+    alg_list = ['ACUS3']
     SIMidx_list = [0]
+    DSidx_dict = {'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}
+    if nu_typ_loop:
+        for typ in typ_list:
+            DSidx_dict[typ] = [i for i in range(dsidx_size)]
     #############################################################################################
 
     # dataset for random

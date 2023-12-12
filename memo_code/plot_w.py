@@ -27,3 +27,6 @@ plt.xlabel('distance from center to user')
 plt.ylabel('log_10(||h||)')
 plt.show()
 fig.savefig("C:/Users/manab/Documents/231115/image/fig_4.png")
+
+def get_status():
+    pass

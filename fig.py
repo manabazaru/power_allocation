@@ -47,6 +47,10 @@ def make_SNR_SINR_figure(usr_list, snr_med, snr_std, sinr_med, sinr_std, fig_tit
     save.save_fig(fig, fig_title)
 
 def make_SINR_figure(nu_list, alg_list, sinr_dict, fig_title):
+    plt.style.use('default')
+    sns.set()
+    sns.set_style('whitegrid')
+    sns.set_palette('Set1')
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1)
     for alg in alg_list:
@@ -58,10 +62,14 @@ def make_SINR_figure(nu_list, alg_list, sinr_dict, fig_title):
             std = np.std(sinr_arr[nu_idx])
             med_arr[nu_idx] = med
             std_arr[nu_idx] = std
-        ax.errorbar(nu_list, med_arr, yerr=std_arr, marker='o', label=alg, capthick=1, capsize=8, lw=1)
+        if 'ACUS' in alg:
+            lbl = f'ACUS(M={alg[4:]})'
+        else:
+            lbl = alg
+        ax.errorbar(nu_list, med_arr, yerr=std_arr, marker='o', label=lbl, capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
-    ax.set_ylabel('SINR[dB]')
-    fig.legend()
+    ax.set_ylabel('SINR')
+    ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
     plt.show()
     save.save_fig(fig, fig_title)
 
@@ -130,7 +138,7 @@ def make_capacitys_fig_with_std(nu_list, cap_dict, alg_list, fig_title):
         # calculate median and standard deviation of each nu dataset
         for nu_idx in range(nu_size):
             non_zero_arr = np.where(cap_arr[nu_idx]!=0)[0]
-            new_cap_arr = cap_arr[nu_idx, non_zero_arr]
+            new_cap_arr = cap_arr[nu_idx, non_zero_arr] / 10**9
             med = statistics.median(new_cap_arr)
             std = np.std(new_cap_arr)
             med_arr[nu_idx] = med
@@ -144,9 +152,14 @@ def make_capacitys_fig_with_std(nu_list, cap_dict, alg_list, fig_title):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     for alg in alg_list:
-        ax.errorbar(nu_list, med_dict[alg], yerr=std_dict[alg], marker='o', label=alg, capthick=1, capsize=8, lw=1)
+        if 'ACUS' in alg:
+            lbl = f'ACUS(M={alg[4:]})'
+        else:
+            lbl = alg
+        ax.errorbar(nu_list, med_dict[alg], yerr=std_dict[alg], marker='o', label=lbl, capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('capacity [Gbps]')
+    ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
     plt.show()
     save.save_fig(fig, fig_title)
 
@@ -173,7 +186,7 @@ def hist_usr_angles(ang_arr, ds_type):
     for i in range(2):
         hist_usr_angle(data[:,i], ds_type, i)
 
-def make_cumulative_figures(eval_arr_list, label_list, fig_title, save_flg):
+def make_cumulative_figures(eval_arr_list, label_list, fig_title, x_lim, x_range, save_flg):
     data_n = len(eval_arr_list)
     fig = plt.figure(figsize=fp.cumulative_figure_size)
     for i in range(data_n):
@@ -189,14 +202,14 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, save_flg):
     plt.rcParams['ytick.right'] = True
     # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
     plt.legend()
-    plt.xlim(fp.x_lim)
+    plt.xlim(x_lim)
     plt.ylim(fp.y_lim)
     plt.xlabel(fp.x_label, fontsize=fp.fontsize, fontname="MS Gothic")
     plt.ylabel(fp.y_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.xticks(np.arange(fp.x_lim[0], fp.x_lim[1]+fp.x_range, fp.x_range))
+    plt.xticks(np.arange(x_lim[0], x_lim[1]+x_range, x_range))
     plt.yticks(np.arange(fp.y_lim[0], fp.y_lim[1]+fp.y_range, fp.y_range))
     plt.grid()
-    # plt.show()
+    plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)
 
@@ -267,3 +280,11 @@ def heatmap(r, block_population, fig_title, save_flg):
     plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)
+    
+def make_flop_table(data_arr, col_label_arr, fig_title):
+    fig, ax = plt.subplots(1, 1)
+    ax.axis("tight")
+    ax.axis("off")
+    ax.table(cellText=data_arr, colLabels=col_label_arr, loc="center")
+    plt.show()
+    save.save_fig(fig, fig_title)

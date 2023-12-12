@@ -89,7 +89,13 @@ class ZeroForcing(BeamForming):
         hherm = self.herm_transpose(self.h)
         h_hherm = np.dot(self.h, hherm)
         w_unnorm = np.dot(hherm, np.linalg.inv(h_hherm))
+        total_w = 0
         for usr in range(self.usr_n):
             w_vec = w_unnorm[:,usr]
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
+            total_w += w_usr_sum
+        """
+        ave = total_w / self.usr_n
+        with open(f'test_{self.usr_n}.txt', 'a') as f:
+            f.write(str(ave)+'\n')"""

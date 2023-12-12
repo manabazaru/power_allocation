@@ -79,29 +79,52 @@ def test_RUS(city, usrs_per_group):
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
-    save.save_eval_arr(cap_list, filename)
+    # save.save_eval_arr(cap_list, filename)
     # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
 
 def test_RUS_with_random(usr_n, radius, usrs_per_group):
     xy_arr = rand_uni.generate_random_uniform_usr_xy(usr_n, radius)
     ang_arr = utils.xy2ang(xy_arr, -param.z)
-    filename = f'RUS_planar_{city}_usrs_per_group={usrs_per_group}'
+    # filename = f'RUS_planar_{city}_usrs_per_group={usrs_per_group}'
     eqpt = AUSEquipment(ang_arr, usrs_per_group)
     usr_n = eqpt.get_usr_n()
-    start = 0
-    end = 20
+    # start = 0
+    # end = 20
     aus = grouping.RUS(eqpt)
     aus.execute()
-    aus.print_group_info(start, end)
+    # aus.print_group_info(start, end)
     group_table = aus.get_group_table()
     haps = phaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, usr_ant_angr, param.trans_pwr)
     cap_list = ev.get_sum_cap_arr()
-    save.save_eval_arr(cap_list, filename)
+    # save.save_eval_arr(cap_list, filename)
     # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
 
+
+"""y_list = []
+start = 1
+end = 40
+step = 1
+for usr_n in range(start, end, step):
+    # test_RUS_with_random(usr_n*60, 20, usr_n)
+    with open(f'test_{usr_n}.txt', 'r') as f:
+        txt = f.readlines()
+        total = 0
+        for i in range(len(txt)):
+            num = float(txt[i])
+            total+=num
+        ave = num/len(txt)
+        y_list.append(ave)
+import matplotlib.pyplot as plt
+y_list = np.array(y_list)
+y_list = y_list / y_list[0]
+# y_list = np.log2(y_list)
+for y in y_list:
+    print(y)
+plt.plot([i for i in range(start, end, step)], y_list)
+plt.show()"""
 
 # test_AUS(1200, 12, 100)
 # test_RUS(1200, 12, 100)
@@ -188,7 +211,7 @@ def make_eval_fig(city, m_val_list):
         eval_arr_list.append(eval_arr)
     figure = fig.make_cumulative_figures(eval_arr_list, label_list, title, True)
 
-
+"""
 for usr_per_group in range(12, 40, 12):    
     for m in range(3,6):
         title = f'planar_random_usrs_per_group={usr_per_group}'
@@ -198,7 +221,7 @@ for usr_per_group in range(12, 40, 12):
     test_RUS(city, usr_per_group)
     print(f"Now showing the situation of tokyo whose usrs_per_group={usr_per_group}")
     make_eval_fig(title, [3,4,5])
-
+"""
 """
 for usr_per_group in range(10, 60, 10):
     title = f'tokyo_usrs_per_group={usr_per_group}'
