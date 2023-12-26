@@ -69,6 +69,29 @@ def make_SINR_figure(nu_list, alg_list, sinr_dict, fig_title):
         ax.errorbar(nu_list, med_arr, yerr=std_arr, marker='o', label=lbl, capthick=1, capsize=8, lw=1)
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('SINR')
+    # ax.set_ylim(-40, 50)
+    ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
+    plt.show()
+    save.save_fig(fig, fig_title)
+
+def make_cos_relativity_figure(nu_list, alg_list, ang_dict, fig_title):
+    plt.style.use('default')
+    sns.set()
+    sns.set_style('whitegrid')
+    sns.set_palette('Set1')
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    for alg in alg_list:
+        data_list = ang_dict[alg]
+        med_arr = data_list[0]
+        std_arr = data_list[1]
+        if 'ACUS' in alg:
+            lbl = f'ACUS(M={alg[4:]})'
+        else:
+            lbl = alg
+        ax.errorbar(nu_list, med_arr, yerr=std_arr, marker='o', label=lbl, capthick=1, capsize=8, lw=1)
+    ax.set_xlabel('number of users in a group')
+    ax.set_ylabel('SINR')
     ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
     plt.show()
     save.save_fig(fig, fig_title)

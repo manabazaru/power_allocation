@@ -8,14 +8,14 @@ def main():
 
     #############################################################################################
     # simulation parameters
-    r_list = [20]
-    nu_list = [i for i in range(5, 105, 5)]
+    r_list = [5]
+    nu_list = [i for i in range(10, 200, 10)]
     nu_typ_loop = True
     typ_list = ['random'+str(i*100) for i in nu_list]
     dsidx_size = 2
     shp_list = ['p']
     t_pwr_list = [120]
-    alg_list = ['ACUS3']
+    alg_list = ['RUS']
     SIMidx_list = [0]
     DSidx_dict = {'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}
     if nu_typ_loop:

@@ -77,6 +77,12 @@ class GroupEvaluator():
     
     def get_noise(self):
         return self.noise
+
+    def get_h(self):
+        return self.h
+    
+    def get_w(self):
+        return self.w
     
 class SystemEvaluator():
     def __init__(self, group_table, usr_ant_angr_arr, trans_pwr):
@@ -183,3 +189,17 @@ class SystemEvaluator():
             noise_arr[head:head+usr_n] += noise
             head += usr_n
         return noise_arr
+    
+    def get_h_list(self):
+        h_list = []
+        for ev in self.eval_list:
+            h = ev.get_h()
+            h_list.append(h)
+        return h_list
+    
+    def get_w_list(self):
+        w_list = []
+        for ev in self.eval_list:
+            w = ev.get_w()
+            w_list.append(w)
+        return w_list

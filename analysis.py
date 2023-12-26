@@ -12,6 +12,7 @@ from parameters import Parameter as param
 from us_equipment import AUSEquipment
 import numpy as np
 from us_equipment import AUSEquipment
+import statistics
 
 # 2023/11/23
 # generate heatmap of tokyo whose radius list is [20, 50, 100]
@@ -186,6 +187,9 @@ def generate_cumulative_cap(typ, nu, r, shp, dsidx_list, alg_list, t_pwr, sim_id
         caps_list.append(new_cap_arr)
     fig.make_cumulative_figures(caps_list, alg_list, f'cumulative_capacity_r={r}_typ={typ}_shp={shp}_alg={alg_list}_nt={param.planar_antenna_size_of_side**2}', x_lim, x_range, True)
 
+def generate_maxNu_nt_fig(r, nu_list, nt_list, grp_n_dict, shp, dsidx_list, t_pwr, alg_list, sim_idx_dict):
+    pass
+
 def generate_flop_table(nu_list, grp_n, r, shp, dsidx, alg_list, t_pwr, sim_idx_dict):
     ds_list = [None for i in range(len(nu_list))]
     for nu_idx, nu in enumerate(nu_list):
@@ -211,7 +215,69 @@ def generate_flop_table(nu_list, grp_n, r, shp, dsidx, alg_list, t_pwr, sim_idx_
     data_arr = np.array(data_list)
     fig.make_flop_table(data_arr, row0, f'flop_table_nu={nu_list}_r={r}_alg={alg_list}')
 
-        
+# 2023/12/19 for analysing the cosine relativity
+def generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, dsidx_size, shp, t_pwr, alg_list, sim_idx):
+    nu_size = len(nu_list)
+    # generate dataset list
+    ds_list = [[] for i in range(nu_size)]
+    for nu_idx, nu in enumerate(nu_list):
+        typ = 'random' + str(int(nu*grp_n))
+        for ds_idx in range(dsidx_size):
+            ds = simulation.Dataset(typ, nu, r, shp, ds_idx)
+            ds_list[nu_idx].append(ds)
+    
+    # generate cos_relativity data
+    data_dict = {}  # key is alg name
+    for alg in alg_list:
+        med_ang_arr = np.zeros(nu_size)
+        std_ang_arr = np.zeros(nu_size)
+        for nu_idx, nu in enumerate(nu_list):
+            ang_arr = np.zeros(int(nu*grp_n*dsidx_size))
+            ang_cnt = 0
+            for ds in ds_list[nu_idx]:
+                sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                h_arr_list = sim.get_h_list()
+                for h_arr in h_arr_list:
+                    # compare [ai, -bi] to others ([aj, -bj] and [bj, aj])
+                    nt = h_arr.shape[1]
+                    new_h_arr = np.zeros([nu*2, nt*2])
+                    ang_table = np.zeros([nu, nu*2]) + 3600
+                    for h_idx, h in enumerate(h_arr):
+                        h_real = h.real
+                        h_imag = h.imag
+                        new_h_arr[h_idx*2] = np.concatenate([h_real, -1*h_imag], 0)
+                        new_h_arr[h_idx*2+1] = np.concatenate([h_imag, h_real], 0)
+                    for h_idx in range(nu):
+                        new_h_idx = h_idx * 2
+                        new_h = new_h_arr[new_h_idx]
+                        h_norm = sum(new_h**2) ** 0.5
+                        for h2_idx in range(h_idx+1, nu):
+                            new_h2_idx = h2_idx * 2
+                            new_h2 = new_h_arr[new_h2_idx]
+                            h2_norm = sum(new_h2**2) ** 0.5
+                            h_h2 = sum(new_h * new_h2)
+                            cos_theta = h_h2 / (h_norm * h2_norm)
+                            theta = np.rad2deg(np.arccos(cos_theta))
+                            ang_table[h_idx, new_h2_idx] = theta
+                            ang_table[h2_idx, new_h_idx] = theta
+                        for h2_idx in range(nu):
+                            new_h2_idx = h2_idx * 2 + 1
+                            new_h2 = new_h_arr[new_h2_idx]
+                            h2_norm = sum(new_h2**2) ** 0.5
+                            h_h2 = sum(new_h * new_h2)
+                            cos_theta = h_h2 / (h_norm * h2_norm)
+                            theta = np.rad2deg(np.arccos(cos_theta))
+                            ang_table[h_idx, new_h2_idx] = theta
+                        min_ang = min(ang_table[h_idx])
+                        ang_arr[ang_cnt] = min_ang
+                        ang_cnt += 1
+            med_ang = statistics.median(ang_arr)
+            std_ang = np.std(ang_arr)
+            med_ang_arr[nu_idx] = med_ang
+            std_ang_arr[nu_idx] = std_ang
+        data_list = [med_ang_arr, std_ang_arr]
+        data_dict[alg] = [med_ang_arr, std_ang_arr]
+    fig.make_cos_relativity_figure(nu_list, alg_list, data_dict, f"cos_relativity_nu_list={nu_list[0]}~{nu_list[-1]}_r={r}_shp={shp}_size={grp_n*dsidx_size}")
 
 
 def execute():
@@ -221,13 +287,16 @@ def execute():
     sim_idx_dict = {}
     for alg in alg_list: sim_idx_dict[alg] = 0
     # sim_idx_dict['RUS'] = 1 
-    nu_list = [i for i in range(10, 105, 10)]
+    nu_list = [i for i in range(10, 200, 10)]
     grp_dict = {}
     grp_n = 100
+    r = 10
+    shp = 'p'
     for nu in nu_list:
         grp_dict[nu] = grp_n
-    generate_sinr_figure_with_random(100, nu_list, grp_dict, 'c', [0,1], 120, alg_list, sim_idx_dict)
-    generate_nu_cap_figures_with_random([100], nu_list, grp_dict, 'c', [0,1], 120, alg_list, sim_idx_dict)
+    generate_sinr_figure_with_random(r, nu_list, grp_dict, shp, [0,1], 120, alg_list, sim_idx_dict)
+    # generate_nu_cap_figures_with_random([r], nu_list, grp_dict, [shp], [0,1], 120, alg_list, sim_idx_dict)
+    # generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, 2, 'p', 120, alg_list, 0)
     x_lim_list = [[3, 4], [4, 10], [0, 0.01]]
     x_range_list = [0.2, 0.5, 0.001]
     for nu_idx, nu in enumerate(nu_list):

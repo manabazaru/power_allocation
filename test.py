@@ -103,28 +103,35 @@ def test_RUS_with_random(usr_n, radius, usrs_per_group):
     # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
 
 
-"""y_list = []
-start = 1
-end = 40
-step = 1
+y_list = []
+label_list = [i for i in range(10, 50, 2)]
+start = 10
+end = 70
+step = 10
+rep = 100
+r = 5
 for usr_n in range(start, end, step):
-    # test_RUS_with_random(usr_n*60, 20, usr_n)
-    with open(f'test_{usr_n}.txt', 'r') as f:
+    test_RUS_with_random(usr_n*rep, r, usr_n)
+    with open(f'test_{usr_n}_r={r}_nt={param.planar_antenna_size_of_side**2}.txt', 'r') as f:
         txt = f.readlines()
         total = 0
+        abs_list = []
         for i in range(len(txt)):
             num = float(txt[i])
             total+=num
+            abs_list.append(num)
         ave = num/len(txt)
-        y_list.append(ave)
+        med = statistics.median(abs_list)
+        y_list.append(med)
 import matplotlib.pyplot as plt
 y_list = np.array(y_list)
-y_list = y_list / y_list[0]
-# y_list = np.log2(y_list)
-for y in y_list:
-    print(y)
+# y_list = y_list / y_list[0]
+# y_list = np.log2(1/y_list)
+for i in range(len(y_list)):
+    y = y_list[i]
+    print(label_list[i], ': ', y)
 plt.plot([i for i in range(start, end, step)], y_list)
-plt.show()"""
+plt.show()
 
 # test_AUS(1200, 12, 100)
 # test_RUS(1200, 12, 100)

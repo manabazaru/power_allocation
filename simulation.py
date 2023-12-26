@@ -180,6 +180,11 @@ class Simulation():
         self.intf_arr = None
         self.noise_arr = None
         self.cap_arr = None  # capacity list
+        # unsaved data
+        self.h_list = None
+        self.w_list = None
+        # flg whether execute has been done or not
+        self.is_grouping_executed = False
     
     # print simulation status on console and set it as string
     def print_simulation_status(self):
@@ -219,6 +224,8 @@ class Simulation():
     
     # load or generate (self.group_table, self.grp_mAD_arr, self.usr_mAD_arr)
     def execute_grouping(self):
+        # change flg as 'Done'
+        self.is_grouping_executed = True
         try:
             # load
             self.group_table = load.load_group_table(self.grp_tag)
@@ -273,6 +280,8 @@ class Simulation():
             self.intf_arr = ev.get_interference()
             self.noise_arr = ev.get_noise_pwr()
             self.cap_arr = np.array(ev.get_sum_cap_arr())
+            self.h_list = ev.get_h_list()
+            self.w_list = ev.get_w_list()
             # save
             save.save_sig_arr(self.sig_arr, self.sig_tag)
             save.save_interference_arr(self.intf_arr, self.intf_tag)
@@ -304,3 +313,21 @@ class Simulation():
     
     def get_cap_arr(self):
         return self.cap_arr
+    
+    def get_h_list(self):
+        if self.h_list is None:
+            if not self.is_grouping_executed: self.execute_grouping()
+            if self.ds.ua_angr_arr is None: self.ds.setup_ua_angr_arr()
+            ua_angr_arr = self.ds.get_ua_angr_arr()
+            ev = eval(self.group_table, ua_angr_arr, self.t_pwr)
+            self.h_list = ev.get_h_list()
+        return self.h_list
+    
+    def get_w_list(self):
+        if self.w_list is None:
+            if not self.is_grouping_executed: self.execute_grouping()
+            if self.ds.ua_angr_arr is None: self.ds.setup_ua_angr_arr()
+            ua_angr_arr = self.ds.get_ua_angr_arr()
+            ev = eval(self.group_table, ua_angr_arr, self.t_pwr)
+            self.w_list = ev.get_w_list()
+        return self.w_list    

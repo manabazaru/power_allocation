@@ -57,7 +57,7 @@ class BeamForming():
         self.set_phase_rotation()
         self.set_radiation_pattern()
         self.h = self.path_loss*self.phs_rot*self.radiat_ptn
-    
+
     def set_w(self):
         for usr in range(self.usr_n):
             w = 1/len(self.w[:,usr])
@@ -79,7 +79,7 @@ class BeamForming():
     
     def get_is_set(self):
         return self.is_set
-
+    
 class ZeroForcing(BeamForming):
     def __init__(self, angr_arr):
         super().__init__(angr_arr)
@@ -95,7 +95,7 @@ class ZeroForcing(BeamForming):
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
             total_w += w_usr_sum
-        """
+        
         ave = total_w / self.usr_n
-        with open(f'test_{self.usr_n}.txt', 'a') as f:
-            f.write(str(ave)+'\n')"""
+        with open(f'test_{self.usr_n}_r={5}_Nt={param.planar_antenna_size_of_side**2}.txt', 'a') as f:
+            f.write(str(ave)+'\n')
