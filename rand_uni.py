@@ -52,3 +52,13 @@ def generate_usr_xy2(size, com_r, index, point):
     y = com_r_arr*np.sin(az_rad)
     xy_arr = np.array([x, y]).T
     return xy_arr
+
+def generate_equal_interval_usr_xy(size, com_r):
+    intv = 2 * np.pi / size
+    xy_arr = np.zeros([size, 2], dtype=float)
+    for i in range(size):
+        theta = intv * i
+        xy_arr[i,0] = com_r*np.cos(theta)
+        xy_arr[i,1] = com_r*np.sin(theta)
+    print(xy_arr)
+    return xy_arr

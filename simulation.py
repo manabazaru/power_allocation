@@ -91,6 +91,9 @@ class Dataset():
             elif 'onedge' in self.typ:
                 nuk = int(self.typ[6:])
                 self.xy_arr = rand_uni.generate_random_usr_xy_on_edge(nuk, self.r)
+            elif 'eiedge' in self.typ:
+                nuk = int(self.typ[6:])
+                self.xy_arr = rand_uni.generate_equal_interval_usr_xy(nuk, self.r)
             else:
                 raise Exception('[INFO ERROR] There is an error in setup_xy(): '+\
                                 'Invalid type to create xy array is entered.')

@@ -283,25 +283,27 @@ def generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, dsidx_size, s
 def execute():
     path.set_cur_dir()
     # generate_tokyo_heatmap()
-    alg_list =['AUS']
+    alg_list =['RUS']
     sim_idx_dict = {}
     for alg in alg_list: sim_idx_dict[alg] = 0
     # sim_idx_dict['RUS'] = 1 
     nu_list = [12]
     grp_dict = {}
     grp_n = 100
-    r = 100
-    shp = 'c'
+    r = 50
+    shp = 'p'
+    dsidx_head = 40
+    dsidx_size = 10
     for nu in nu_list:
         grp_dict[nu] = grp_n
     # generate_sinr_figure_with_random(r, nu_list, grp_dict, shp, [0,1], 120, alg_list, sim_idx_dict)
     # generate_nu_cap_figures_with_random([r], nu_list, grp_dict, [shp], [0], 150, alg_list, sim_idx_dict)
     # generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, 2, 'p', 120, alg_list, 0)
-    x_lim_list = [[1, 1.6]]
+    x_lim_list = [[0, 2]]
     x_range_list = [0.2]
     for nu_idx, nu in enumerate(nu_list):
         typ = 'random'+str(nu*grp_n)
-        generate_cumulative_cap(typ, nu, r, shp, [i for i in range(30)], alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
+        generate_cumulative_cap(typ, nu, r, shp, [i for i in range(dsidx_head, dsidx_head+dsidx_size)], alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
     cities = ['tokyo', 'sendai', 'nagoya', 'osaka']
     # generate_flop_table([20, 40, 60, 80], 100, 20, 'p', 0, alg_list, 120, sim_idx_dict)
     # for city in cities:

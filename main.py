@@ -8,20 +8,21 @@ def main():
 
     #############################################################################################
     # simulation parameters
-    r_list = [100]
+    r_list = [50]
     nu_list = [12]
     user_scale = 100
     typ_list = ['random'+str(i * user_scale) for i in nu_list]
-    dsidx_size = 30
-    shp_list = ['c']
+    dsidx_size = 10
+    dsidx_head = 40
+    shp_list = ['p']
     t_pwr_list = [120]
-    alg_list = ['AUS']
+    alg_list = ['RUS']
     SIMidx_list = [0]
     DSidx_dict = {'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}
     nu_typ_loop = True
     if nu_typ_loop:
         for typ in typ_list:
-            DSidx_dict[typ] = [i for i in range(dsidx_size)]
+            DSidx_dict[typ] = [i for i in range(dsidx_head, dsidx_head+dsidx_size)]
     #############################################################################################
 
     # dataset for random
