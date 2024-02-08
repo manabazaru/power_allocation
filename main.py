@@ -8,13 +8,13 @@ def main():
 
     #############################################################################################
     # simulation parameters
-    r_list = [50]
-    nu_list = [12]
+    r_list = [50, 100]
+    nu_list = [6,12,18,24,30]
     user_scale = 100
     typ_list = ['random'+str(i * user_scale) for i in nu_list]
-    dsidx_size = 10
-    dsidx_head = 40
-    shp_list = ['p']
+    dsidx_size = 100
+    dsidx_head = 400
+    shp_list = ['p', 'c']
     t_pwr_list = [120]
     alg_list = ['RUS']
     SIMidx_list = [0]

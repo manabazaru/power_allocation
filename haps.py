@@ -46,7 +46,7 @@ class PlanarHAPS(HAPS):
             for ant in range(self.ant_n):
                 xyz = flt_ant_xyz_arr[ant]
                 shift_usr_xyz = usr_xyz - xyz
-                rot_xyz = self.rot_usr_xyz(shift_usr_xyz, 45, -90)
+                rot_xyz = self.rot_usr_xyz(shift_usr_xyz, 0, -90)
                 rot_angr = utils.xyz2angr(rot_xyz)
                 usr_ant_angr[usr, ant] = rot_angr
         return usr_ant_angr

@@ -33,17 +33,19 @@ def test_AUS(usr_n, usrs_per_group, radius):
     start_time = time.time()
     aus.execute()
     end_time = time.time()
-    aus.print_group_info(start, end)
+    # aus.print_group_info(start, end)
     print(f"Calculation time: {end_time-start_time}")
     group_table = aus.get_group_table()
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, usr_ant_angr, param.trans_pwr)
+    print(ev.cond_list)
+    print(np.average(ev.cond_list))
     cap_list = ev.get_sum_cap_arr()
-    print(np.average((ev.get_SNR())))
+    # print(np.average((ev.get_SNR())))
     # save.save_eval_arr(cap_list, filename)
-    fig.make_cumulative_figures(np.array([cap_list]), ['AUS'], "fig_for_20231026", True)
+    fig.make_cumulative_figures(np.array([cap_list]), ['AUS'], "fig_for_20231026", [0,1.8],0.2, False)
 
 def test_AUS2(city, usrs_per_group):
     ang_arr = load.load_angle(city)
@@ -94,15 +96,30 @@ def test_RUS_with_random(usr_n, radius, usrs_per_group):
     aus.execute()
     # aus.print_group_info(start, end)
     group_table = aus.get_group_table()
-    haps = phaps()
+    haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
     ev = eval(group_table, usr_ant_angr, param.trans_pwr)
-    cap_list = ev.get_sum_cap_arr()
+    # print(ev.cond_list)
+    # print("average", np.average(ev.cond_list))
+    # print("median", np.median(ev.cond_list))
+    # cap_list = ev.get_sum_cap_arr()
     # save.save_eval_arr(cap_list, filename)
     # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
+    return ev.cond_list
 
-
+nu = 12
+usr = 1200
+r = 50
+att = 10
+grp_n = usr//nu
+cond_arrs = np.zeros(grp_n*att)
+for i in range(att):
+    head = i*grp_n
+    cond_arrs[head:head+grp_n] = test_RUS_with_random(usr, r, nu)
+print(f"average: {np.average(cond_arrs)}")
+print(f"median:  {np.median(cond_arrs)}")
+"""
 y_list = []
 label_list = [i for i in range(10, 50, 2)]
 start = 10
@@ -131,7 +148,7 @@ for i in range(len(y_list)):
     y = y_list[i]
     print(label_list[i], ': ', y)
 plt.plot([i for i in range(start, end, step)], y_list)
-plt.show()
+plt.show()"""
 
 # test_AUS(1200, 12, 100)
 # test_RUS(1200, 12, 100)

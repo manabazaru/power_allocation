@@ -93,6 +93,7 @@ class SystemEvaluator():
         self.usr_n = 0
         self.eval_list = [-1 for i in range(self.group_n)]
         self.sum_cap_arr = np.zeros(self.group_n)
+        self.cond_list = np.zeros(self.group_n)
         self.set_all()
     
     def set_eval_list(self):
@@ -109,6 +110,7 @@ class SystemEvaluator():
             bf = ZeroForcing(group_angr_arr)
             ev = GroupEvaluator(bf, self.trans_pwr)
             self.eval_list[group] = ev
+            self.cond_list[group] = bf.get_cond()
         print(">] 100 %")
 
     def set_usr_n(self):
