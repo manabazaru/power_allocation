@@ -9,13 +9,13 @@ def main():
     #############################################################################################
     # simulation parameters
     r_list = [50, 100]
-    nu_list = [6,12,18,24,30]
-    user_scale = 100
+    nu_list = [i for i in range(6, 36, 6)]
+    user_scale = 10000
     typ_list = ['random'+str(i * user_scale) for i in nu_list]
-    dsidx_size = 100
-    dsidx_head = 400
-    shp_list = ['p', 'c']
-    t_pwr_list = [120]
+    dsidx_size = 1
+    dsidx_head = 0
+    shp_list = ['pc']
+    t_pwr_list = [150]
     alg_list = ['RUS']
     SIMidx_list = [0]
     DSidx_dict = {'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}

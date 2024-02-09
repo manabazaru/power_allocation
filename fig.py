@@ -224,8 +224,8 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, x_lim, x_range
     plt.rcParams['ytick.direction'] = 'in'
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
-    # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
-    # plt.legend()
+    plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
+    plt.legend()
     plt.xlim(x_lim)
     plt.ylim(fp.y_lim)
     plt.xlabel(fp.x_label, fontsize=fp.fontsize, fontname="MS Gothic")
