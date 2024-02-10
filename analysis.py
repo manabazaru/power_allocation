@@ -279,6 +279,56 @@ def generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, dsidx_size, s
         data_dict[alg] = [med_ang_arr, std_ang_arr]
     fig.make_cos_relativity_figure(nu_list, alg_list, data_dict, f"cos_relativity_nu_list={nu_list[0]}~{nu_list[-1]}_r={r}_shp={shp}_size={grp_n*dsidx_size}")
 
+# 2024/2/9
+def generate_SINR_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
+    sinr_arr_list = []
+    label_list = []
+    for r in r_list:
+        # label of r
+        if len(r_list) != 1:
+            r_label = f'{r}km, '
+        else:
+            r_label = ''
+        for shp in shp_list:
+            # label of shape of antenna
+            if len(shp_list) != 1:
+                shp_label = 'Planar, ' if shp == 'p' else 'Cylinder, '
+            else:
+                shp_label = ''
+            
+            # generate dataset
+            ds_list = []
+            for dsidx in dsidx_list:
+                ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+                ds_list.append(ds)
+            for alg in alg_list:
+                # label of alg
+                if len(alg_list) != 1:
+                    if 'ACUS' in alg or 'MRUS' in alg:
+                        m = alg[4:]
+                        alg_label = alg[:4] + f'(M={m})'
+                    else:
+                        alg_label = alg
+                else:
+                    alg_label = ''
+                label = r_label + shp_label + alg_label
+                if label[-1] == ' ':
+                    label = label[:-2]
+                
+                # simulation
+                sinr_list = []
+                for ds in ds_list:
+                    for sim_idx in range(sim_idx_dict[alg]):
+                        sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                        sim.execute_all()
+                        sinr_arr = sim.get_sig_arr() / (sim.get_intf_arr() + sim.get_noise_arr())
+                        sinr_list.append(sinr_arr)
+                sinr_list = np.array(sinr_list).flatten()
+
+                sinr_arr_list.append(sinr_list)
+                label_list.append(label)
+    fig.make_cumulative_SINR(sinr_arr_list, label_list, f"SINR_CDF_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, True)
+
 
 def execute():
     path.set_cur_dir()

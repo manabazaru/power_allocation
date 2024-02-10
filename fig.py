@@ -237,7 +237,7 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, x_lim, x_range
     if save_flg:
         save.save_fig(fig, fig_title)
 
-def make_cumulative_SINR(sinr_arr_list, label_list, fig_title, save_flg):
+def make_cumulative_SINR(sinr_arr_list, label_list, fig_title, x_lim, x_range, save_flg):
     data_n = len(sinr_arr_list)
     fig = plt.figure(figsize=fp.cumulative_figure_size)
     for i in range(data_n):
@@ -254,11 +254,11 @@ def make_cumulative_SINR(sinr_arr_list, label_list, fig_title, save_flg):
     # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
     plt.legend()
     plt.title(fig_title, y=-0.15)
-    plt.xlim(fp.sinr_x_lim)
-    plt.ylim(fp.sinr_y_lim)
+    plt.xlim(x_lim)
+    plt.ylim(fp.y_lim)
     plt.xlabel(fp.sinr_x_label, fontsize=fp.fontsize, fontname="MS Gothic")
     plt.ylabel(fp.sinr_y_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.xticks(np.arange(fp.sinr_x_lim[0], fp.sinr_x_lim[1]+fp.sinr_x_range, fp.sinr_x_range))
+    plt.xticks(np.arange(x_lim[0], x_lim[1]+fp.sinr_x_range, fp.sinr_x_range))
     plt.yticks(np.arange(fp.sinr_y_lim[0], fp.sinr_y_lim[1]+fp.sinr_y_range, fp.sinr_y_range))
     plt.grid()
     plt.show()
