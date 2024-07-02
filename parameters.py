@@ -8,7 +8,7 @@ class Parameter:
     carrier_freq = 2.5 * 10**9
     antenna_height = 4.4 * 10**-4
     planar_antenna_size_of_side = 14
-    distance_ratio_between_planar_antenna = 0.5 # 0.6
+    distance_ratio_between_planar_antenna = 0.6 # 0.6
     # for beamforming
     distance_unit_correction = {'km':10**3, 'm':1}
     three_bandwidth_angle = 65

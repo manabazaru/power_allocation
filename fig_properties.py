@@ -12,16 +12,17 @@ class FigProperty:
                 'rand2' : [0,300]
                }
     # for cumulative figures
-    cumulative_figure_size = (7,6)
+    cumulative_figure_size = (7,4)
     marker = ['k-.', 'b--', 'g-', 'r:', 'c-', 'm--', 'y-.', 'r-']
     gbps = 1.0 * 10**9
-    x_label = '通信路容量の合計値 [Gbps]'
-    y_label = '累積分布'
+    x_label = 'Sum Channel Capacities [Gbps]'
+    y_label = 'Cumulative Distribution'
     x_lim = [0, 3]
     y_lim = [0, 1]
     x_range = 0.2
     y_range = 0.1
-    fontsize = 10
+    fontsize = 20
+    fontsize2 = 30
     # for SINR cumulative figures
     sinr_x_label = 'SINR [dB]'
     sinr_y_label = 'cumulative distribution'
