@@ -279,6 +279,55 @@ def generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, dsidx_size, s
         data_dict[alg] = [med_ang_arr, std_ang_arr]
     fig.make_cos_relativity_figure(nu_list, alg_list, data_dict, f"cos_relativity_nu_list={nu_list[0]}~{nu_list[-1]}_r={r}_shp={shp}_size={grp_n*dsidx_size}")
 
+# 2024/06/28
+def generate_user_capacity_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
+    sinr_arr_list = []
+    label_list = []
+    for r in r_list:
+        # label of r
+        if len(r_list) != 1:
+            r_label = f'{r}km, '
+        else:
+            r_label = ''
+        for shp in shp_list:
+            # label of shape of antenna
+            if len(shp_list) != 1:
+                shp_label = 'Planar, ' if shp == 'p' else 'Cylinder, '
+            else:
+                shp_label = ''
+            
+            # generate dataset
+            ds_list = []
+            for dsidx in dsidx_list:
+                ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+                ds_list.append(ds)
+            for alg in alg_list:
+                # label of alg
+                if len(alg_list) != 1:
+                    if 'ACUS' in alg or 'MRUS' in alg:
+                        m = alg[4:]
+                        alg_label = alg[:4] + f'(M={m})'
+                    else:
+                        alg_label = alg
+                else:
+                    alg_label = ''
+                label = r_label + shp_label + alg_label
+                if label[-1] == ' ':
+                    label = label[:-2]
+                
+                # simulation
+                sinr_list = []
+                for ds in ds_list:
+                    for sim_idx in range(sim_idx_dict[alg]+1):
+                        sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                        sim.execute_all()
+                        sinr_arr = 10**(-6) * param.bandwidth * np.log2(1+sim.get_sig_arr() / (sim.get_intf_arr() + sim.get_noise_arr()))
+                        sinr_list.append(sinr_arr)
+                sinr_list = np.array(sinr_list).flatten()
+                sinr_arr_list.append(sinr_list)
+                label_list.append(label)
+    fig.make_cumulative_SINR2(sinr_arr_list, label_list, f"user_capacity_CDF_typ={typ}_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, True)
+
 # 2024/2/9
 def generate_SINR_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
     sinr_arr_list = []
@@ -318,45 +367,203 @@ def generate_SINR_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, si
                 # simulation
                 sinr_list = []
                 for ds in ds_list:
-                    for sim_idx in range(sim_idx_dict[alg]):
+                    for sim_idx in range(sim_idx_dict[alg]+1):
                         sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
                         sim.execute_all()
                         sinr_arr = sim.get_sig_arr() / (sim.get_intf_arr() + sim.get_noise_arr())
-                        sinr_list.append(sinr_arr)
+                        sinr_list.append(10 * np.log10(sinr_arr))
                 sinr_list = np.array(sinr_list).flatten()
-
                 sinr_arr_list.append(sinr_list)
                 label_list.append(label)
-    fig.make_cumulative_SINR(sinr_arr_list, label_list, f"SINR_CDF_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, True)
+    fig.make_cumulative_SINR(sinr_arr_list, label_list, f"SINR_CDF_typ={typ}_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, True)
+
+def generate_capacity_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
+    cap_arr_list = []
+    label_list = []
+    for r in r_list:
+        # label of r
+        if len(r_list) != 1:
+            r_label = f'{r}km, '
+        else:
+            r_label = ''
+        for shp in shp_list:
+            # label of shape of antenna
+            if len(shp_list) != 1:
+                shp_label = 'Planar, ' if shp == 'p' else 'Cylinder, '
+            else:
+                shp_label = ''
+            
+            # generate dataset
+            ds_list = []
+            for dsidx in dsidx_list:
+                ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+                ds_list.append(ds)
+            for alg in alg_list:
+                # label of alg
+                if len(alg_list) != 1:
+                    if 'ACUS' in alg or 'MRUS' in alg:
+                        m = alg[4:]
+                        alg_label = alg[:4] + f'(M={m})'
+                    else:
+                        alg_label = alg
+                else:
+                    alg_label = ''
+                label = r_label + shp_label + alg_label
+                if label[-1] == ' ':
+                    label = label[:-2]
+                
+                # simulation
+                cap_list = []
+                for ds in ds_list:
+                    for sim_idx in range(sim_idx_dict[alg]+1):
+                        sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                        sim.execute_all()
+                        cap_arr = sim.get_cap_arr()
+                        cap_list.append(cap_arr)
+                cap_list = np.array(cap_list).flatten()
+                cap_arr_list.append(cap_list)
+                label_list.append(label)
+    fig.make_cumulative_figures(cap_arr_list, label_list, f"SumCap_CDF_typ={typ}_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, True)
+
+def generate_mAD_CDF(typ, nu, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range):
+    mAD_arr_list = []
+    label_list = []
+    for r in r_list:
+        # label of r
+        if len(r_list) != 1:
+            r_label = f'{r}km, '
+        else:
+            r_label = ''
+        for shp in shp_list:
+            # label of shape of antenna
+            if len(shp_list) != 1:
+                shp_label = 'Planar, ' if shp == 'p' else 'Cylinder, '
+            else:
+                shp_label = ''
+            
+            # generate dataset
+            ds_list = []
+            for dsidx in dsidx_list:
+                ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+                ds_list.append(ds)
+            for alg in alg_list:
+                # label of alg
+                if len(alg_list) != 1:
+                    if 'ACUS' in alg or 'MRUS' in alg:
+                        m = alg[4:]
+                        alg_label = alg[:4] + f'(M={m})'
+                    else:
+                        alg_label = alg
+                else:
+                    alg_label = ''
+                label = r_label + shp_label + alg_label
+                if label[-1] == ' ':
+                    label = label[:-2]
+                
+                # simulation
+                mAD_list = []
+                for ds in ds_list:
+                    for sim_idx in range(sim_idx_dict[alg]+1):
+                        sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                        sim.execute_grouping()
+                        mAD_arr = sim.get_user_mAD_arr()
+                        mAD_list.append(mAD_arr)
+                mAD_list = np.array(mAD_list).flatten()
+                mAD_arr_list.append(mAD_list)
+                label_list.append(label)
+    fig.make_cumulative_minAD(mAD_arr_list, label_list, f"mAD_CAD_typ={typ}_r={r_list}_shp={shp_list}_alg={alg_list}", x_lim, x_range, True)
+
+
+def generate_med_cap_nu(dist_typ, grp_n, nu_list, r_list, shp_list, dsidx_list, alg_list, t_pwr, sim_idx_dict, x_lim, x_range, y_lim, y_range):
+    cap_arr_list = []
+    label_list = []
+    for r in r_list:
+        # label of r
+        if len(r_list) != 1:r_label = f'{r}km, '
+        else: r_label = ''
+        for shp in shp_list:
+            # label of shape of antenna
+            if len(shp_list) != 1:
+                shp_label = 'Planar, ' if shp == 'p' else 'Cylinder, '
+            else: shp_label = ''
+            for alg in alg_list:
+                # label of alg
+                if len(alg_list) != 1:
+                    if 'ACUS' in alg or 'MRUS' in alg: alg_label = alg[:4] + f'(M={alg[4:]})'
+                    else: alg_label = alg
+                else: alg_label = ''
+                label = r_label + shp_label + alg_label
+                if len(label) != 0:
+                    if label[-1] == ' ': label = label[:-2]
+            
+                # generate dataset
+                nu_cap_arr_list = []
+                for nu in nu_list:
+                    typ = dist_typ + str(grp_n*nu)
+                    ds_list = []
+                    for dsidx in dsidx_list:
+                        ds = simulation.Dataset(typ, nu, r, shp, dsidx)
+                        ds_list.append(ds)
+
+                    # simulation
+                    cap_list = []
+                    for ds in ds_list:
+                        for sim_idx in range(sim_idx_dict[alg]+1):
+                            sim = simulation.Simulation(ds, t_pwr, alg, sim_idx)
+                            sim.execute_all()
+                            cap_arr = sim.get_cap_arr()
+                            cap_list.append(cap_arr)
+                    cap_list = np.array(cap_list).flatten()
+                    nu_cap_arr_list.append(cap_list)
+                
+                cap_arr_list.append(nu_cap_arr_list)
+                label_list.append(label)
+    print(np.array(cap_arr_list).shape)
+    fig.make_nu_med_cap(nu_list, cap_arr_list, label_list, f"capNu_r={r_list}_shp={shp_list}_alg={alg_list}.png", x_lim, x_range, y_lim, y_range, True)
 
 
 def execute():
     path.set_cur_dir()
     # generate_tokyo_heatmap()
-    alg_list =['RUS', 'AUS', 'ACUS3', 'ACUS4', 'ACUS5']
+    alg_list =['AUS', 'ACUS3', 'ACUS4', 'ACUS5']
     sim_idx_dict = {}
     for alg in alg_list: sim_idx_dict[alg] = 0
     # sim_idx_dict['RUS'] = 1 
-    nu_list = [12]
+    nu_list = [i for i in range(12, 18, 6)]
     grp_dict = {}
-    grp_n = 100
-    r = 100
-    shp = 'c'
+    grp_n = 2000
+    r = 20
+    shp = 'p'
     dsidx_head = 0
-    dsidx_size = 30
-    for nu in nu_list:
+    dsidx_size = 1
+    dsidx_list = [i for i in range(dsidx_head, dsidx_size+dsidx_head)]
+    """for nu in nu_list:
         grp_dict[nu] = grp_n
-    # generate_sinr_figure_with_random(r, nu_list, grp_dict, shp, [0,1], 120, alg_list, sim_idx_dict)
+    generate_sinr_figure_with_random(r, nu_list, grp_dict, shp, [0], 150, alg_list, sim_idx_dict)"""
     # generate_nu_cap_figures_with_random([r], nu_list, grp_dict, [shp], [0], 150, alg_list, sim_idx_dict)
     # generate_cos_relativity_between_h_in_random(r, nu_list, grp_n, 2, 'p', 120, alg_list, 0)
+    """generate_med_cap_nu('random', 2000, [i for i in range(10, 140, 10)], [20], ['p'], 
+                        [0], alg_list, 150, sim_idx_dict, [10, 130], 10, [0, 10], 1)"""
     x_lim_list = [[0.8, 1.8]]
     x_range_list = [0.2]
     for nu_idx, nu in enumerate(nu_list):
-        typ = 'random'+str(nu*grp_n)
-        generate_cumulative_cap(typ, nu, r, shp, [i for i in range(dsidx_head, dsidx_head+dsidx_size)], alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
+        typ = 'random' + str(nu*grp_n)
+        """generate_capacity_CDF(typ, nu, [50], ['p'], 
+                              dsidx_list, 
+                              alg_list, 120, sim_idx_dict, [1.2, 1.8], 0.05)"""
+        # generate_mAD_CDF(typ, nu, [50], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [15, 50], 10)
+        # generate_cumulative_cap(typ, nu, r, shp, dsidx_list, alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
+        # generate_SINR_CDF(typ, nu, [50], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [-10, 40], 10)
     cities = ['tokyo', 'sendai', 'nagoya', 'osaka']
     # generate_flop_table([20, 40, 60, 80], 100, 20, 'p', 0, alg_list, 120, sim_idx_dict)
-    # for city in cities:
-        # generate_cumulative_cap(city, 20, 20, 'p', [0], alg_list, 120, sim_idx_dict, [0, 5], 0.2)
-
+    for city in ['tokyo']:
+        """generate_capacity_CDF(city, 12, [20], ['p'], 
+                              dsidx_list, 
+                              alg_list, 120, sim_idx_dict, [2.3, 2.5], 0.1)"""
+        # generate_mAD_CDF(typ, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [15, 50], 5)
+        # generate_cumulative_cap(typ, nu, r, shp, dsidx_list, alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
+        # generate_SINR_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [25, 40], 5)
+        # generate_mAD_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [10, 50], 5)
+        generate_user_capacity_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [25, 40], 5)
+        
 execute()

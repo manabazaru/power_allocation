@@ -3,7 +3,8 @@ import tqdm
 import utils
 from parameters import Parameter as param
 from us_equipment import AUSEquipment
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import axes3d, Axes3D
 class HAPS():
     def __init__(self):
         self.wv_len = param.c/param.carrier_freq
@@ -70,7 +71,7 @@ class CyrindricalHAPS(HAPS):
         # length
         self.h_r = 0.6 * self.wv_len * (self.sd_h_n / (2*np.pi))
         self.b_r = 0.5 * self.h_r
-        self.dv = 0.5 * self.wv_len  # 0.6
+        self.dv = 0.6 * self.wv_len 
         self.ant_height = param.antenna_height
         self.set_all()
 
@@ -332,7 +333,6 @@ def test():
     sd_xyz_2022 = cy_2022.sd_xyz_arr.reshape([v*h, size])
     xyz_arr_2021 = np.concatenate([sd_xyz_2021, cy_2021.btm_xyz_arr], 0) * 10**5
     xyz_arr_2022 = np.concatenate([sd_xyz_2022, cy_2022.btm_xyz_arr], 0) * 10**5
-    import matplotlib.pyplot as plt
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     

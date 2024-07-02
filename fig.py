@@ -70,7 +70,7 @@ def make_SINR_figure(nu_list, alg_list, sinr_dict, fig_title):
     ax.set_xlabel('number of users in a group')
     ax.set_ylabel('SINR')
     # ax.set_ylim(-40, 50)
-    ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
+    # ax.legend(bbox_to_anchor=(0,0), loc='lower left', borderaxespad=1, fontsize=10)
     plt.show()
     save.save_fig(fig, fig_title)
 
@@ -212,26 +212,41 @@ def hist_usr_angles(ang_arr, ds_type):
 
 def make_cumulative_figures(eval_arr_list, label_list, fig_title, x_lim, x_range, save_flg):
     data_n = len(eval_arr_list)
-    fig = plt.figure(figsize=fp.cumulative_figure_size)
+    fig, ax = plt.subplots(figsize=fp.cumulative_figure_size)
+    # axins = ax.inset_axes([0.6, 0.2, 0.25, 0.25])
+    # axins2 = ax.inset_axes([0.08, 0.6, 0.25, 0.25])
     for i in range(data_n):
         eval_arr = eval_arr_list[i] / fp.gbps
         sorted_eval_arr = utils.sort_arr(eval_arr)
         data = utils.add_cumulative_ratio(sorted_eval_arr)
         plt.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+        # axins.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+        # axins2.plot(data[0], data[1], fp.marker[i], label=label_list[i])
     plt.rcParams['font.family'] = 'Times New Roman'  
     plt.rcParams['font.size'] = fp.fontsize
     plt.rcParams['xtick.direction'] = 'in'
     plt.rcParams['ytick.direction'] = 'in'
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
-    plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
-    plt.legend()
-    plt.xlim(x_lim)
-    plt.ylim(fp.y_lim)
-    plt.xlabel(fp.x_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.ylabel(fp.y_label, fontsize=fp.fontsize, fontname="MS Gothic")
+    plt.tick_params(labelsize=18)
+    ax.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
+    ax.legend()
+    ax.set_xlim(x_lim)
+    ax.set_ylim(fp.y_lim)
+    ax.set_xlabel(fp.x_label, fontsize=fp.fontsize, fontname="MS Gothic")
+    ax.set_ylabel(fp.y_label, fontsize=fp.fontsize, fontname="MS Gothic")
     plt.xticks(np.arange(x_lim[0], x_lim[1]+x_range, x_range))
     plt.yticks(np.arange(fp.y_lim[0], fp.y_lim[1]+fp.y_range, fp.y_range))
+    # axins.set_xlim(2.42, 2.48)
+    # axins.set_ylim(0.7, 0.8)
+    # axins.set_xticks([2.42, 2.44, 2.46, 2.48])
+    # axins.set_yticks([0.7, 0.75, 0.8])
+    # axins2.set_xlim(2.34, 2.38)
+    # axins2.set_ylim(0.1, 0.2)
+    # axins2.set_xticks([2.34, 2.36, 2.38])
+    # axins2.set_yticks([0.1, 0.15, 0.2])
+    # ax.indicate_inset_zoom(axins)
+    # ax.indicate_inset_zoom(axins2)
     plt.grid()
     plt.show()
     if save_flg:
@@ -239,12 +254,14 @@ def make_cumulative_figures(eval_arr_list, label_list, fig_title, x_lim, x_range
 
 def make_cumulative_SINR(sinr_arr_list, label_list, fig_title, x_lim, x_range, save_flg):
     data_n = len(sinr_arr_list)
-    fig = plt.figure(figsize=fp.cumulative_figure_size)
+    fig, ax = plt.subplots(figsize=fp.cumulative_figure_size)
+    # axins = ax.inset_axes([0.6, 0.2, 0.37, 0.37])
     for i in range(data_n):
         sinr_arr = sinr_arr_list[i]
         sorted_sinr_arr = utils.sort_arr(sinr_arr)
         data = utils.add_cumulative_ratio(sorted_sinr_arr)
-        plt.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+        ax.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+        # axins.plot(data[0], data[1], fp.marker[i], label=label_list[i])
     plt.rcParams['font.family'] = 'Times New Roman'  
     plt.rcParams['font.size'] = fp.fontsize
     plt.rcParams['xtick.direction'] = 'in'
@@ -252,20 +269,62 @@ def make_cumulative_SINR(sinr_arr_list, label_list, fig_title, x_lim, x_range, s
     plt.rcParams['xtick.top'] = True
     plt.rcParams['ytick.right'] = True
     # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
-    plt.legend()
-    plt.title(fig_title, y=-0.15)
-    plt.xlim(x_lim)
-    plt.ylim(fp.y_lim)
-    plt.xlabel(fp.sinr_x_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.ylabel(fp.sinr_y_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.xticks(np.arange(x_lim[0], x_lim[1]+fp.sinr_x_range, fp.sinr_x_range))
+    ax.legend()
+    ax.set_title(fig_title, y=-0.15)
+    ax.set_xlim(x_lim)
+    ax.set_ylim(fp.sinr_y_lim)
+    ax.set_xlabel(fp.sinr_x_label, fontsize=fp.fontsize, fontname="MS Gothic")
+    ax.set_ylabel(fp.sinr_y_label, fontsize=fp.fontsize, fontname="MS Gothic")
+    # axins.set_xlim(18, 18.25)
+    # axins.set_ylim(0.42, 0.44)
+    # ax.indicate_inset_zoom(axins)
+    plt.xticks(np.arange(x_lim[0], x_lim[1]+x_range, x_range))
     plt.yticks(np.arange(fp.sinr_y_lim[0], fp.sinr_y_lim[1]+fp.sinr_y_range, fp.sinr_y_range))
     plt.grid()
     plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)
 
-def make_cumulative_minAD(minAD_arr_list, label_list, fig_title, save_flg):
+    plt.rcParams['xtick.direction'] = 'in'
+
+
+def make_cumulative_SINR2(sinr_arr_list, label_list, fig_title, x_lim, x_range, save_flg):
+    data_n = len(sinr_arr_list)
+    fig, ax = plt.subplots(figsize=fp.cumulative_figure_size)
+    # axins = ax.inset_axes([0.6, 0.2, 0.37, 0.37])
+    for i in range(data_n):
+        sinr_arr = sinr_arr_list[i]
+        sorted_sinr_arr = utils.sort_arr(sinr_arr)
+        data = utils.add_cumulative_ratio(sorted_sinr_arr)
+        ax.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+        # axins.plot(data[0], data[1], fp.marker[i], label=label_list[i])
+    plt.rcParams['font.family'] = 'Times New Roman'  
+    plt.rcParams['font.size'] = fp.fontsize
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
+    # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
+    ax.legend(fontsize=18)
+    # ax.set_title(fig_title, y=-0.15)
+    # ax.set_xlim(x_lim)
+    ax.set_ylim(fp.sinr_y_lim)
+    ax.set_xlabel("Channel Capacity [Mbps]", fontsize=fp.fontsize, fontname="MS Gothic")
+    ax.set_ylabel(fp.sinr_y_label, fontsize=fp.fontsize, fontname="MS Gothic")
+    # axins.set_xlim(18, 18.25)
+    # axins.set_ylim(0.42, 0.44)
+    # ax.indicate_inset_zoom(axins)
+    # plt.xticks(np.arange(x_lim[0], x_lim[1]+x_range, x_range))
+    # plt.yticks(np.arange(fp.sinr_y_lim[0], fp.sinr_y_lim[1]+fp.sinr_y_range, fp.sinr_y_range))
+    plt.grid()
+    plt.show()
+    if save_flg:
+        save.save_fig(fig, fig_title)
+
+    plt.rcParams['xtick.direction'] = 'in'
+
+
+def make_cumulative_minAD(minAD_arr_list, label_list, fig_title, x_lim, xrange, save_flg):
     data_n = len(minAD_arr_list)
     fig = plt.figure(figsize=fp.cumulative_figure_size)
     for i in range(data_n):
@@ -282,12 +341,41 @@ def make_cumulative_minAD(minAD_arr_list, label_list, fig_title, save_flg):
     # plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
     plt.legend()
     plt.title(fig_title, y=-0.15)
-    plt.xlim(fp.minAD_x_lim)
+    plt.xlim(x_lim)
     plt.ylim(fp.minAD_y_lim)
     plt.xlabel(fp.minAD_x_label, fontsize=fp.fontsize, fontname="MS Gothic")
     plt.ylabel(fp.minAD_y_label, fontsize=fp.fontsize, fontname="MS Gothic")
-    plt.xticks(np.arange(fp.minAD_x_lim[0], fp.minAD_x_lim[1]+fp.minAD_x_range, fp.minAD_x_range))
+    plt.xticks(np.arange(x_lim[0], x_lim[1]+xrange, xrange))
     plt.yticks(np.arange(fp.minAD_y_lim[0], fp.minAD_y_lim[1]+fp.minAD_y_range, fp.minAD_y_range))
+    plt.grid()
+    plt.show()
+    if save_flg:
+        save.save_fig(fig, fig_title)
+
+
+
+def make_nu_med_cap(nu_list, data_arr_list, label_list, fig_title, x_lim, x_range, y_lim, y_range, save_flg):
+    fig = plt.figure(figsize=fp.cumulative_figure_size)
+    for i in range(len(data_arr_list)):
+        data_list = []
+        for j in range(len(data_arr_list[i])):
+            med = np.median(data_arr_list[i][j]) / 10**9
+            data_list.append(med)
+        plt.plot(nu_list, data_list, fp.marker[i], label=label_list[i], marker='o')
+    plt.rcParams['font.family'] = 'Times New Roman'  
+    plt.rcParams['font.size'] = fp.fontsize
+    plt.rcParams['xtick.direction'] = 'in'
+    plt.rcParams['ytick.direction'] = 'in'
+    plt.rcParams['xtick.top'] = True
+    plt.rcParams['ytick.right'] = True
+    plt.legend(loc='lower center', bbox_to_anchor=(.5, 1), fontsize=20)
+    plt.legend()
+    plt.xlim(x_lim)
+    plt.ylim(y_lim)
+    plt.xlabel('No. of Users', fontsize=fp.fontsize, fontname="MS Gothic")
+    plt.ylabel('Median of the System Capacities[Gbps]', fontsize=fp.fontsize, fontname="MS Gothic")
+    plt.xticks(np.arange(x_lim[0], x_lim[1]+x_range, x_range))
+    plt.yticks(np.arange(y_lim[0], y_lim[1]+y_range, y_range))
     plt.grid()
     plt.show()
     if save_flg:
