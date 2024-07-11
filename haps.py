@@ -52,6 +52,15 @@ class PlanarHAPS(HAPS):
                 usr_ant_angr[usr, ant] = rot_angr
         return usr_ant_angr
 
+class VariableAntennaPlanarHAPS(PlanarHAPS):
+    def __init__(self, side_antenna_n):
+        super().__init__()
+        self.sd_n = side_antenna_n
+        self.ant_n = self.sd_n ** 2
+        self.xyz_arr = np.zeros([self.sd_n, self.sd_n, 3])
+        # parameter
+        self.set_antenna_xyz()
+        
 
 class CyrindricalHAPS(HAPS):
     def __init__(self):

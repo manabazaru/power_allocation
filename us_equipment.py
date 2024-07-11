@@ -4,6 +4,29 @@ import utils
 from parameters import Parameter as param
 import tqdm
 
+class BSEquipment():
+    def __init__(self, cell_n, usr_ang_arr):
+        pass
+    
+
+class UEBSEquipment():
+    def __init__(self, ang_arr, UE_n, BS_n):
+        # Angle array without removed users.
+        self.ang_arr = ang_arr
+        self.usr_n = len(self.ang_arr)
+        self.usrs_per_group = 1
+        self.ue_n = UE_n
+        self.bs_n = BS_n
+    
+    def get_ang_all(self):
+        return self.ang_arr
+    
+    def get_usr_n(self):
+        return self.usr_n
+    
+    def get_ue_bs_user_tuple(self):
+        return (self.ue_n, self.bs_n)
+
 class AUSEquipment():
     def __init__(self, ang_arr, usrs_per_group, *args):
         # Angle array without removed users.
