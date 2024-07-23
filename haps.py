@@ -51,6 +51,26 @@ class PlanarHAPS(HAPS):
                 rot_angr = utils.xyz2angr(rot_xyz)
                 usr_ant_angr[usr, ant] = rot_angr
         return usr_ant_angr
+    
+    def get_user_antenna_angle_r_arr_from_user_xy_arr(self, xy_arr):
+        print("[INFO HAPS] Calculation of user angle from each antenna "+
+              "element has been started.")
+        ang_arr = utils.xy2ang(xy_arr, -self.altitude)
+        usr_n = len(ang_arr)
+        usr_ant_angr = np.zeros([usr_n, self.ant_n, 3])
+        usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude)
+        usr_xyz_arr = utils.angr2xyz(usr_angr_arr)
+        flt_ant_xyz_arr = self.xyz_arr.reshape(self.sd_n**2,3)
+        for usr in tqdm.tqdm(range(usr_n)):
+            usr_xyz = usr_xyz_arr[usr]
+            for ant in range(self.ant_n):
+                xyz = flt_ant_xyz_arr[ant]
+                shift_usr_xyz = usr_xyz - xyz
+                rot_xyz = self.rot_usr_xyz(shift_usr_xyz, 0, -90)
+                rot_angr = utils.xyz2angr(rot_xyz)
+                usr_ant_angr[usr, ant] = rot_angr
+        return usr_ant_angr
+
 
 class VariableAntennaPlanarHAPS(PlanarHAPS):
     def __init__(self, side_antenna_n):

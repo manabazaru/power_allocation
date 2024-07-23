@@ -28,7 +28,16 @@ class TwoStagePrecoding():
         self.w_nf = np.zeros([self.ant_n, M], dtype=np.complex64)
         self.w_bf = np.zeros([M, self.ue_usr_n], dtype=np.complex64)
         self.w = np.zeros([self.ant_n, self.ue_usr_n], dtype=np.complex64)
-
+        print("M", M)
+        self.set_all()
+        
+    def set_all(self):
+        self.set_h()
+        self.set_w_nf()
+        self.set_w_bf()
+        self.w = np.dot(self.w_nf, self.w_bf)
+        
+    
     def herm_transpose(self, matrix):
         return np.conjugate(matrix.T, dtype=np.complex64)
     
@@ -68,7 +77,7 @@ class TwoStagePrecoding():
         u, sigma, vh = np.linalg.svd(bs_h)
         vh_h = self.herm_transpose(vh)
         self.w_nf = vh[:,self.bs_usr_n:self.bs_usr_n+self.M]
-    
+        # print(self.w_nf.shape, self.bs_usr_n, self.M)
     def set_w_bf(self):
         ue_h = np.dot(self.h[:self.ue_usr_n], self.w_nf)
         hherm = self.herm_transpose(ue_h)
@@ -87,90 +96,7 @@ class TwoStagePrecoding():
         for usr in range(self.ue_usr_n):
             w_vec = w_unnorm[:, usr]
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
-            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
-
-        
-class TerrestrialChannelCoefficient():
-    def __init__(self, angr_arr, terr_antenna:base):
-        self.usr_n = angr_arr.shape[0]
-        self.ant_n = angr_arr.shape[1]
-        self.ang_arr = angr_arr[:,:,:2]
-        self.d_arr = angr_arr[:,:,2]
-        self.wv_len = param.c/param.carrier_freq
-        self.ter_ant = terr_antenna
-        # for channel coefficient h
-        self.path_loss = np.zeros([self.usr_n, self.ant_n])
-        self.phs_rot = np.zeros([self.usr_n, self.ant_n],dtype=np.complex64)
-        self.radiat_ptn = np.zeros([self.usr_n, self.ant_n])
-        self.h = np.zeros([self.usr_n, self.ant_n],dtype=np.complex64)
-        # for gain
-        self.bw = param.bandwidth
-        self.three_bw_azi = self.ter_ant.azi_3db
-        self.three_bw_ele = self.ter_ant.elev_3db
-        self.max_att = self.ter_ant.max_attenuation
-        self.sd_att = self.ter_ant.side_attenuation
-        self.trans_gain = self.ter_ant.max_gain
-        self.rcv_gain = param.rcv_gain     
-
-    def herm_transpose(self, matrix):
-        return np.conjugate(matrix.T, dtype=np.complex64)
-    
-    def set_path_loss(self):
-        p = 1 / (4*np.pi*self.d_arr/self.wv_len)
-        self.path_loss = p
-    
-    def set_phase_rotation(self):
-        phs_rot = np.exp(2*np.pi*self.d_arr / self.wv_len * 1j)
-        self.phs_rot = phs_rot
-    
-    def calc_gain(self, ang):
-        az = ang[0]
-        el = ang[1]
-        v_radiat = -min(12*(el/self.three_bw_ang)**2, self.sd_att)
-        h_radiat = -min(12*(az/self.three_bw_ang)**2, self.max_att)
-        radiat = -min(-(v_radiat+h_radiat), self.max_att)
-        gain_db = self.trans_gain + radiat + self.rcv_gain
-        gain = 10**(gain_db/20)
-        return gain
-
-    def set_radiation_pattern(self):
-        for usr in range(self.usr_n):
-            for ant in range(self.ant_n):
-                ang = self.ang_arr[usr, ant]
-                gain = self.calc_gain(ang)
-                self.radiat_ptn[usr, ant] = gain
-    
-    def set_h(self):
-        self.set_path_loss()
-        self.set_phase_rotation()
-        self.set_radiation_pattern()
-        self.h = self.path_loss*self.phs_rot*self.radiat_ptn
-    
-    def set_w_nf(self):
-        bs_h = self.h[self.ue_usr_n:]
-        u, sigma, vh = np.linalg.svd(bs_h)
-        vh_h = self.herm_transpose(vh)
-        self.w_nf = vh[:,self.bs_usr_n:self.bs_usr_n+self.M]
-    
-    def set_w_bf(self):
-        ue_h = np.dot(self.h[:self.ue_usr_n], self.w_nf)
-        hherm = self.herm_transpose(ue_h)
-        h_hherm = np.dot(ue_h, hherm)
-        u, s, vh = np.linalg.svd(h_hherm)
-        s_inv = np.zeros_like(s)
-        
-        for i in range(len(s)):
-            if s[i] > 1e-20:
-                s_inv[i] = 1.0 / s[i]
-        
-        S_inv = np.diag(s_inv)
-        
-        h_hherm_inv = vh.conj().T.dot(S_inv).dot(u.conj().T)
-        w_unnorm = np.dot(self.w_nf, np.dot(hherm, h_hherm_inv))
-        for usr in range(self.ue_usr_n):
-            w_vec = w_unnorm[:, usr]
-            w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
-            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum       
+            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum   
 
 
 class BeamForming():
@@ -279,6 +205,49 @@ class ZeroForcing(BeamForming):
         w_unnorm = np.dot(hherm, h_hherm_inv)
         total_w = 0
         for usr in range(self.usr_n):
+            w_vec = w_unnorm[:,usr]
+            w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
+            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
+            total_w += w_usr_sum
+        """
+        ave = total_w / self.usr_n
+        with open(f'test_{self.usr_n}_r={5}_Nt={param.planar_antenna_size_of_side**2}.txt', 'a') as f:
+            f.write(str(ave)+'\n')
+        """
+        
+    def get_cond(self):
+        return self.cond
+
+class ZeroForcing2(BeamForming):
+    def __init__(self, angr_arr, haps_usr_n):
+        super().__init__(angr_arr)
+        self.haps_usr_n = haps_usr_n
+        self.w = np.zeros([self.haps_usr_n, self.ant_n],dtype=np.complex64).T
+        self.cond = 0
+        self.set_all()
+
+    def set_w(self):
+        haps_h = self.h[:self.haps_usr_n]
+        hherm = self.herm_transpose(haps_h)
+        h_hherm = np.dot(haps_h, hherm)
+        self.cond = np.linalg.cond(h_hherm)
+        u, s, vh = np.linalg.svd(h_hherm, full_matrices=False)  # full_matrices=Falseでu, vhの形状をarrに合わせる
+        s_inv = np.zeros_like(s)
+
+        # ゼロでない特異値の逆数を計算
+        for i in range(len(s)):
+            if s[i] > 1e-20:  # ゼロに近い値を無視
+                s_inv[i] = 1.0 / s[i]
+
+        # S_invを対角行列にする
+        S_inv = np.diag(s_inv)
+
+        # 複素数行列の場合は共役転置を使用
+        h_hherm_inv = vh.conj().T.dot(S_inv).dot(u.conj().T)
+        # h_hherm_inv = np.linalg.inv(h_hherm)
+        w_unnorm = np.dot(hherm, h_hherm_inv)
+        total_w = 0
+        for usr in range(self.haps_usr_n):
             w_vec = w_unnorm[:,usr]
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum
