@@ -62,7 +62,7 @@ class IntegratedEnvironment():
                     intf += abs(g)**2 * bs_pwr
             self.haps_sinr[usr] = sig / (intf + self.noise)
         # terrestrial user
-        for usr in range(self.haps_usr_n):
+        for usr in range(self.bs_usr_n):
             bs_sec_idx = self.bs_usr_bs_sec_main_arr[usr]
             bs_idx = bs_sec_idx[0]
             sec_idx = bs_sec_idx[1]
@@ -139,7 +139,7 @@ class IntegratedEnvironment2():
                     intf += abs(g)**2 * bs_pwr
             self.haps_sinr[usr] = sig / (intf + self.noise)
         # haps user
-        for usr in range(self.haps_usr_n):
+        for usr in range(self.bs_usr_n):
             bs_sec_idx = self.bs_usr_bs_sec_main_arr[usr]
             bs_idx = bs_sec_idx[0]
             sec_idx = bs_sec_idx[1]

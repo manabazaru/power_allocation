@@ -23,7 +23,7 @@ max_att_arr = np.zeros(bs_size) + 20
 max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
 sec_size = 3
-haps_usr_n = 12
+haps_usr_n = 30
 haps_xy_arr = np.array([[15*np.cos(i/180*np.pi), 15*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/haps_usr_n))])
 usr_xy_arr = np.concatenate([haps_xy_arr, bs_xy_arr])
 side_antenna_n = 14
@@ -48,7 +48,10 @@ bs_sinr_db_arr = 10 * np.log10(bs_sinr_arr)
 haps_sinr_db_arr = 10 * np.log10(haps_sinr_arr)
 bs_sinr_db_arr2 = 10 * np.log10(bs_sinr_arr2)
 haps_sinr_db_arr2 = 10 * np.log10(haps_sinr_arr2)
-
+print(haps_sinr_db_arr)
+print(bs_sinr_db_arr)
+print(bs_sinr_db_arr2)
+print(haps_sinr_db_arr2)
 
 #########################################################
 fig = plt.figure()
