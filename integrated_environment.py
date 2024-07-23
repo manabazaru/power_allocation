@@ -17,7 +17,7 @@ class IntegratedEnvironment():
         self.bs_usr_n = len(self.bs_usr_xy_arr)
         self.usr_xy_arr = np.concatenate([self.haps_usr_xy_arr, self.bs_usr_xy_arr])
         self.haps_usr_ant_angr_arr = self.haps.get_user_antenna_angle_r_arr_from_user_xy_arr(self.usr_xy_arr)
-        self.usr_bs_sector_angr_arr = self.bss.calc_user_bs_sector_angr(self.usr_xy_arr)
+        self.usr_bs_sector_angr_arr = self.bss.calc_user_bs_sector_angr(self.usr_xy_arr, usr_height=0.001)
         self.M = M
         self.usr_gain = usr_gain
         self.precoder = precoding(self.haps_usr_ant_angr_arr, self.bs_usr_n, self.M)
@@ -61,6 +61,7 @@ class IntegratedEnvironment():
                     g = self.haps_g[usr, bs_idx, sec_idx]
                     intf += abs(g)**2 * bs_pwr
             self.haps_sinr[usr] = sig / (intf + self.noise)
+            print('haps', sig, intf, self.noise)
         # terrestrial user
         for usr in range(self.bs_usr_n):
             bs_sec_idx = self.bs_usr_bs_sec_main_arr[usr]
@@ -80,6 +81,7 @@ class IntegratedEnvironment():
                 w = self.w[:,usr2]
                 intf += abs(sum(hu*w))**2 * haps_power_arr[usr2]
             self.bs_sinr[usr] = sig / (intf + self.noise)
+            print("ter", sig, intf, self.noise)
 
     
 class IntegratedEnvironment2():
@@ -93,7 +95,7 @@ class IntegratedEnvironment2():
         self.bs_usr_n = len(self.bs_usr_xy_arr)
         self.usr_xy_arr = np.concatenate([self.haps_usr_xy_arr, self.bs_usr_xy_arr])
         self.haps_usr_ant_angr_arr = self.haps.get_user_antenna_angle_r_arr_from_user_xy_arr(self.usr_xy_arr)
-        self.usr_bs_sector_angr_arr = self.bss.calc_user_bs_sector_angr(self.usr_xy_arr)
+        self.usr_bs_sector_angr_arr = self.bss.calc_user_bs_sector_angr(self.usr_xy_arr, usr_height=0.001)
         self.M = M
         self.usr_gain = usr_gain
         self.precoder = zf2(self.haps_usr_ant_angr_arr, self.haps_usr_n)
@@ -125,7 +127,6 @@ class IntegratedEnvironment2():
         for usr in range(self.haps_usr_n):
             hu = self.haps_usr_h[usr]
             wu = self.w[:,usr]
-            print(self.w)
             sig = abs(sum(hu*wu))**2 * haps_power_arr[usr]
             intf = 0
             for usr2 in range(self.haps_usr_n):
@@ -138,6 +139,7 @@ class IntegratedEnvironment2():
                     g = self.haps_g[usr, bs_idx, sec_idx]
                     intf += abs(g)**2 * bs_pwr
             self.haps_sinr[usr] = sig / (intf + self.noise)
+            print('haps', sig, intf, self.noise)
         # haps user
         for usr in range(self.bs_usr_n):
             bs_sec_idx = self.bs_usr_bs_sec_main_arr[usr]
@@ -157,6 +159,8 @@ class IntegratedEnvironment2():
                 w = self.w[:,usr2]
                 intf += abs(sum(hu*w))**2 * haps_power_arr[usr2]
             self.bs_sinr[usr] = sig / (intf + self.noise)
+            print("ter", sig, intf, self.noise)
+
 
 
             

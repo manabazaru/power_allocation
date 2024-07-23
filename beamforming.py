@@ -28,15 +28,15 @@ class TwoStagePrecoding():
         self.w_nf = np.zeros([self.ant_n, M], dtype=np.complex64)
         self.w_bf = np.zeros([M, self.ue_usr_n], dtype=np.complex64)
         self.w = np.zeros([self.ant_n, self.ue_usr_n], dtype=np.complex64)
-        print("M", M)
+        self.w_nf_test = np.zeros(self.w_nf.shape, dtype=np.complex64)
+        self.bs_test = 0
         self.set_all()
         
     def set_all(self):
         self.set_h()
         self.set_w_nf()
         self.set_w_bf()
-        self.w = np.dot(self.w_nf, self.w_bf)
-        
+        print(np.dot(self.h[self.ue_usr_n:], self.w_nf))
     
     def herm_transpose(self, matrix):
         return np.conjugate(matrix.T, dtype=np.complex64)
@@ -56,7 +56,7 @@ class TwoStagePrecoding():
         h_radiat = -min(12*(az/self.three_bw_ang)**2, self.max_att)
         radiat = -min(-(v_radiat+h_radiat), self.max_att)
         gain_db = self.trans_gain + radiat + self.rcv_gain
-        gain = 10**(gain_db/20)
+        gain = 10**(gain_db/10)
         return gain
 
     def set_radiation_pattern(self):
@@ -76,10 +76,18 @@ class TwoStagePrecoding():
         bs_h = self.h[self.ue_usr_n:]
         u, sigma, vh = np.linalg.svd(bs_h)
         vh_h = self.herm_transpose(vh)
-        self.w_nf = vh[:,self.bs_usr_n:self.bs_usr_n+self.M]
+        self.w_nf = vh_h[:,self.bs_usr_n:self.bs_usr_n+self.M]
+        # print(self.w_nf.shape)
+        for i in range(len(self.w_nf)):
+            for j in range(len(self.w_nf[i])):
+                self.w_nf_test[i][j] = self.w_nf[i][j]
+        # print("test",self.w_nf-self.w_nf_test)
+        self.bs_test = bs_h
         # print(self.w_nf.shape, self.bs_usr_n, self.M)
+    
     def set_w_bf(self):
         ue_h = np.dot(self.h[:self.ue_usr_n], self.w_nf)
+        print("ue_h", ue_h.shape)
         hherm = self.herm_transpose(ue_h)
         h_hherm = np.dot(ue_h, hherm)
         u, s, vh = np.linalg.svd(h_hherm)
@@ -140,7 +148,7 @@ class BeamForming():
         h_radiat = -min(12*(az/self.three_bw_ang)**2, self.max_att)
         radiat = -min(-(v_radiat+h_radiat), self.max_att)
         gain_db = self.trans_gain + radiat + self.rcv_gain
-        gain = 10**(gain_db/20)
+        gain = 10**(gain_db/10)
         return gain
 
     def set_radiation_pattern(self):

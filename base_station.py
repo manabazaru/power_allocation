@@ -77,12 +77,12 @@ class BaseStations():
             raise ValueError("Something wrong!!")
         return usr_xy_arr, usr_bs_sector_idx_arr
     
-    def calc_user_bs_sector_angr(self, usr_xy_arr):
+    def calc_user_bs_sector_angr(self, usr_xy_arr, usr_height):
         usr_n = len(usr_xy_arr)
         bs_n = len(self.bs_list)
         usr_bs_sector_angr = np.zeros([usr_n, bs_n, self.sec_size, 3],dtype=float)
         for bs_idx in range(bs_n):
-            usr_bs_sector_angr[:,bs_idx] = self.bs_list[bs_idx].calc_user_bs_angr(usr_xy_arr)
+            usr_bs_sector_angr[:,bs_idx] = self.bs_list[bs_idx].calc_user_bs_angr(usr_xy_arr, usr_height)
         return usr_bs_sector_angr
         
             
@@ -168,18 +168,18 @@ class BaseStation():
             raise ValueError("Something wrong!!")
         return self.usr_xy_arr, usrs_sector_idx_arr
     
-    def calc_user_bs_angr(self, usr_xy_arr):
+    def calc_user_bs_angr(self, usr_xy_arr, usr_height):
         usr_n = len(usr_xy_arr)
         usr_bs_sector_angr = np.zeros([usr_n, self.sec_size, 3], dtype=float)
-        new_usr_xy_arr = usr_xy_arr
-        new_usr_xy_arr[:,0] -= self.xy[0]
-        new_usr_xy_arr[:,1] -= self.xy[1]
+        new_usr_xy_arr = np.zeros(usr_xy_arr.shape, dtype=float)
+        new_usr_xy_arr[:,0] = usr_xy_arr[:,0] - self.xy[0]
+        new_usr_xy_arr[:,1] = usr_xy_arr[:,1] - self.xy[1]
         for sec_idx in range(self.sec_size):
             ang_rad = self.sector_list[sec_idx].azi_dir / 180 * np.pi
             xyz_arr = np.zeros([usr_n, 3], dtype=float)
             xyz_arr[:,0] = new_usr_xy_arr[:,0]*np.cos(-ang_rad) - new_usr_xy_arr[:,1]*np.sin(-ang_rad)
             xyz_arr[:,1] = new_usr_xy_arr[:,0]*np.sin(-ang_rad) + new_usr_xy_arr[:,1]*np.cos(-ang_rad)
-            xyz_arr[:,2] = -self.height
+            xyz_arr[:,2] = -self.height - usr_height
             usr_bs_sector_angr[:,sec_idx] = utils.xyz2angr(xyz_arr)
         return usr_bs_sector_angr
         

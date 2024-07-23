@@ -13,6 +13,7 @@ bs_size = 6
 haps_com_r = 20
 usrs_per_sec = 1
 bs_xy_arr = np.array([[10*np.cos(i/180*np.pi), 10*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/bs_size))])
+print(bs_xy_arr)
 height_arr = np.zeros(bs_size)+0.051
 com_radius_arr = np.zeros(bs_size) + 2
 azi_3db_arr = np.zeros(bs_size) + 70
@@ -23,7 +24,8 @@ max_att_arr = np.zeros(bs_size) + 20
 max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
 sec_size = 3
-haps_usr_n = 30
+usr_height = 0.001
+haps_usr_n = 12
 haps_xy_arr = np.array([[15*np.cos(i/180*np.pi), 15*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/haps_usr_n))])
 usr_xy_arr = np.concatenate([haps_xy_arr, bs_xy_arr])
 side_antenna_n = 14
@@ -36,7 +38,7 @@ bss = BaseStations(bs_size, height_arr, com_radius_arr, bs_xy_arr, max_gain_arr,
                    elev_3db_arr, elev_tilt_arr, side_att_arr, max_att_arr, 
                    sec_size, users_per_sector_arr=usr_per_sec_arr)
 bss_xy_arr = bss.get_users_xy_arr()
-bs_angr_arr = bss.calc_user_bs_sector_angr(usr_xy_arr)
+bs_angr_arr = bss.calc_user_bs_sector_angr(usr_xy_arr,usr_height)
 p_haps = haps.VariableAntennaPlanarHAPS(side_antenna_n)
 int_nev = ie(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_power_arr)
 int_nev2 = ie2(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_power_arr)
@@ -58,6 +60,7 @@ fig = plt.figure()
 plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
+plt.clim(-40, 20)
 plt.colorbar()
 plt.show()
 
@@ -65,6 +68,7 @@ fig2 = plt.figure()
 plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr2, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
+plt.clim(-40, 20)
 plt.colorbar()
 plt.show()
 

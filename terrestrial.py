@@ -27,7 +27,8 @@ class TerrestrialComunication():
     def herm_transpose(self, matrix):
         return np.conjugate(matrix.T, dtype=np.complex64)
     
-    def calc_hata_path_loss(self, f, height_m, usr_height_m, dis_km, com_type):
+    def calc_hata_path_loss(self, f_input, height_m, usr_height_m, dis_km, com_type):
+        f = f_input / 10**6
         loss = 46.3 + 33.9*np.log10(f) - 13.82*np.log10(height_m) + (44.9-6.55*np.log10(height_m))*np.log10(dis_km)
         loss -= (1.1*np.log10(f)-0.7)*usr_height_m - (1.56*np.log10(f)-0.8)
         if com_type == 'urban':
@@ -65,5 +66,4 @@ class TerrestrialComunication():
                     x = np.random.normal(0, 1, [self.usr_n, self.bs_n, self.sec_n])
                     y = np.random.normal(0, 1, [self.usr_n, self.bs_n, self.sec_n])
                     self.fading = (x + 1j * y) / np.sqrt(2)
-        self.g = self.path_loss * self.radiat_ptn * self.fading       
-    
+        self.g = self.path_loss * self.radiat_ptn * self.fading
