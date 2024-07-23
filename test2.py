@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 ###########################################################
 bs_size = 6
 haps_com_r = 20
-usrs_per_sec = 5
+usrs_per_sec = 1
 bs_xy_arr = np.array([[10*np.cos(i/180*np.pi), 10*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/bs_size))])
 height_arr = np.zeros(bs_size)+0.051
 com_radius_arr = np.zeros(bs_size) + 2
@@ -52,14 +52,28 @@ haps_sinr_db_arr2 = 10 * np.log10(haps_sinr_arr2)
 
 #########################################################
 fig = plt.figure()
-plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_arr, cmap='jet')
+plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
 plt.show()
 
 fig2 = plt.figure()
-plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_arr2, cmap='jet')
+plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr2, cmap='jet')
+plt.xlim(-haps_com_r, haps_com_r)
+plt.ylim(-haps_com_r, haps_com_r)
+plt.colorbar()
+plt.show()
+
+fig3 = plt.figure()
+plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr, cmap='jet')
+plt.xlim(-haps_com_r, haps_com_r)
+plt.ylim(-haps_com_r, haps_com_r)
+plt.colorbar()
+plt.show()
+
+fig3 = plt.figure()
+plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr2, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
