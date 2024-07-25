@@ -46,7 +46,7 @@ for bs_idx, bs_r in enumerate(bs_r_list):
                 side_antenna_n = 4
                 m = side_antenna_n**2 - bs_size*sec_size*usrs_per_sec
                 bs_pwr = 20
-                haps_power_arr = np.zeros(haps_usr_n)+10
+                haps_total_pwr = 120
                 usr_gain = -3
                 bss = BaseStations(bs_size, height_arr, com_radius_arr, bs_xy_arr, max_gain_arr, azi_3db_arr,
                                 elev_3db_arr, elev_tilt_arr, side_att_arr, max_att_arr, 
@@ -54,7 +54,7 @@ for bs_idx, bs_r in enumerate(bs_r_list):
                 bss_xy_arr = bss.get_users_xy_arr()
                 bs_angr_arr = bss.calc_user_bs_sector_angr(usr_xy_arr,usr_height)
                 p_haps = haps.VariableAntennaPlanarHAPS(side_antenna_n)
-                int_nev = ie(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_power_arr)
+                int_nev = ie(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_total_pwr)
                 # int_nev2 = ie2(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_power_arr)
                 # bs_sinr_arr = int_nev.bs_sinr
                 haps_sinr_arr = int_nev.haps_sinr

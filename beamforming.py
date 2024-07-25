@@ -1,11 +1,16 @@
 from parameters import Parameter as param
 import numpy as np
 from base_station import BaseStation as base
+import utils
+
+def cos_similarity(v1, v2):
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 class TwoStagePrecoding():
     def __init__(self, angr_arr, bs_usr_n, M):
         self.usr_n = angr_arr.shape[0]
         self.ant_n = angr_arr.shape[1]
+        self.angr_arr = angr_arr
         self.ang_arr = angr_arr[:,:,:2]
         self.d_arr = angr_arr[:,:,2]
         self.wv_len = param.c/param.carrier_freq
@@ -99,8 +104,38 @@ class TwoStagePrecoding():
         for usr in range(self.ue_usr_n):
             w_vec = w_unnorm[:, usr]
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
-            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum   
-
+            self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum  
+    
+    def get_power_allocation(self, total_pwr):
+        score_arr = np.zeros(self.ue_usr_n)
+        cls_usr_idx = np.zeros(self.ue_usr_n, dtype=int)
+        for h_idx in range(self.ue_usr_n):
+            minimum = 999999999999999
+            min_idx = -1
+            h_angr = self.angr_arr[h_idx]
+            h_xyz = utils.angr2xyz(h_angr)
+            for b_idx in range(self.bs_usr_n):
+                b_angr = self.angr_arr[self.ue_usr_n+b_idx]
+                b_xyz = utils.angr2xyz(b_angr)
+                dis = np.sum((h_xyz-b_xyz)**2)
+                if dis < minimum:
+                    min_idx = b_idx
+                    minimum = dis
+            cls_usr_idx[h_idx] = min_idx
+            haps_h = self.h[h_idx]
+            bs_h = self.h[min_idx]
+            haps_h_real = np.real(haps_h)
+            haps_h_img = np.imag(haps_h)
+            bs_h_real = np.real(bs_h)
+            bs_h_img = np.imag(bs_h)
+            v1 = np.concatenate([haps_h_real, -1*haps_h_img])
+            v2 = np.concatenate([bs_h_real, -1*bs_h_img])
+            v3 = np.concatenate([bs_h_img, bs_h_real])
+            s1 = abs(cos_similarity(v1, v2))
+            s2 = abs(cos_similarity(v1, v3))
+            s = max(s1, s2)
+            score_arr[h_idx] = s
+        return score_arr, cls_usr_idx
 
 class BeamForming():
     def __init__(self, angr_arr):

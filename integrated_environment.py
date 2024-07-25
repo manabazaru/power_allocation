@@ -8,7 +8,7 @@ from parameters import Parameter as param
 
 class IntegratedEnvironment():
     def __init__(self, base_stations:BaseStations, haps: haps.PlanarHAPS, haps_usr_xy_arr, M, usr_gain,
-                 bs_pwr, haps_power_arr):
+                 bs_pwr, haps_total_pwr):
         self.bss = base_stations
         self.haps = haps
         self.haps_usr_xy_arr = haps_usr_xy_arr
@@ -36,9 +36,14 @@ class IntegratedEnvironment():
         self.w = self.precoder.w
         self.bs_n = self.bss.bs_n
         self.sec_n = self.bss.sec_size
+        self.haps_power_arr = np.zeros(self.haps_usr_n) + haps_total_pwr/self.haps_usr_n
         self.set_noise()
-        self.set_SINR(bs_pwr, haps_power_arr)
-        
+        self.set_SINR(bs_pwr, self.haps_power_arr)
+        pwr_arr, cls_arr = self.precoder.get_power_allocation(haps_total_pwr)
+        print(pwr_arr, cls_arr)
+        self.pwr_arr = pwr_arr
+        self.cls_arr = cls_arr
+
     def set_noise(self):
         bandwidth_bd = 10 * np.log10(self.bandwidth)
         noise_dbm = self.noise_pwr_dens + bandwidth_bd + self.noise_fig
@@ -84,7 +89,7 @@ class IntegratedEnvironment():
     
 class IntegratedEnvironment2():
     def __init__(self, base_stations:BaseStations, haps: haps.PlanarHAPS, haps_usr_xy_arr, M, usr_gain,
-                 bs_pwr, haps_power_arr):
+                 bs_pwr, haps_total_pwr):
         self.bss = base_stations
         self.haps = haps
         self.haps_usr_xy_arr = haps_usr_xy_arr
@@ -112,8 +117,9 @@ class IntegratedEnvironment2():
         self.w = self.precoder.w
         self.bs_n = self.bss.bs_n
         self.sec_n = self.bss.sec_size
+        self.haps_power_arr = np.zeros(self.haps_usr_n) + haps_total_pwr/self.haps_usr_n
         self.set_noise()
-        self.set_SINR(bs_pwr, haps_power_arr)
+        self.set_SINR(bs_pwr, self.haps_power_arr)
         
     def set_noise(self):
         bandwidth_bd = 10 * np.log10(self.bandwidth)
