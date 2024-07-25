@@ -9,11 +9,10 @@ from integrated_environment import IntegratedEnvironment2 as ie2
 from matplotlib import pyplot as plt
 
 ###########################################################
-bs_size = 6
+bs_size = 1
 haps_com_r = 20
 usrs_per_sec = 1
-bs_xy_arr = np.array([[10*np.cos(i/180*np.pi), 10*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/bs_size))])
-print(bs_xy_arr)
+bs_xy_arr = np.array([[15*np.cos(i/180*np.pi), 15*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/bs_size))])
 height_arr = np.zeros(bs_size)+0.051
 com_radius_arr = np.zeros(bs_size) + 2
 azi_3db_arr = np.zeros(bs_size) + 70
@@ -25,8 +24,8 @@ max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
 sec_size = 3
 usr_height = 0.001
-haps_usr_n = 12
-haps_xy_arr = np.array([[15*np.cos(i/180*np.pi), 15*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/haps_usr_n))])
+haps_usr_n = 1
+haps_xy_arr = np.array([[18*np.cos(i/180*np.pi), 18*np.sin(i/180*np.pi)] for i in range(-180,0,int(360/haps_usr_n))])
 usr_xy_arr = np.concatenate([haps_xy_arr, bs_xy_arr])
 side_antenna_n = 14
 m = side_antenna_n**2 - bs_size*sec_size*usrs_per_sec
@@ -56,7 +55,7 @@ print(bs_sinr_db_arr2)
 print(haps_sinr_db_arr2)
 
 #########################################################
-fig = plt.figure()
+"""fig = plt.figure()
 plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
@@ -70,7 +69,7 @@ plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.clim(-40, 20)
 plt.colorbar()
-plt.show()
+plt.show()"""
 
 fig3 = plt.figure()
 plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr, cmap='jet')
@@ -79,9 +78,9 @@ plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
 plt.show()
 
-fig3 = plt.figure()
+"""fig3 = plt.figure()
 plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr2, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
-plt.show()
+plt.show()"""

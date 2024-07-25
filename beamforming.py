@@ -36,7 +36,6 @@ class TwoStagePrecoding():
         self.set_h()
         self.set_w_nf()
         self.set_w_bf()
-        print(np.dot(self.h[self.ue_usr_n:], self.w_nf))
     
     def herm_transpose(self, matrix):
         return np.conjugate(matrix.T, dtype=np.complex64)
@@ -77,17 +76,13 @@ class TwoStagePrecoding():
         u, sigma, vh = np.linalg.svd(bs_h)
         vh_h = self.herm_transpose(vh)
         self.w_nf = vh_h[:,self.bs_usr_n:self.bs_usr_n+self.M]
-        # print(self.w_nf.shape)
         for i in range(len(self.w_nf)):
             for j in range(len(self.w_nf[i])):
                 self.w_nf_test[i][j] = self.w_nf[i][j]
-        # print("test",self.w_nf-self.w_nf_test)
         self.bs_test = bs_h
-        # print(self.w_nf.shape, self.bs_usr_n, self.M)
     
     def set_w_bf(self):
         ue_h = np.dot(self.h[:self.ue_usr_n], self.w_nf)
-        print("ue_h", ue_h.shape)
         hherm = self.herm_transpose(ue_h)
         h_hherm = np.dot(ue_h, hherm)
         u, s, vh = np.linalg.svd(h_hherm)
