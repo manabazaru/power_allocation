@@ -9,11 +9,11 @@ from integrated_environment import IntegratedEnvironment2 as ie2
 from matplotlib import pyplot as plt
 
 iter = 1
-ang_start = -240
-ang_end = -120
+ang_start = -360
+ang_end = -1
 ang_dif = 4
-bs_r_list = [5, 10, 15]
-haps_usr_r_dif = 2
+bs_r_list = [10]
+haps_usr_r_dif = 10
 com_r = 20
 r_arr = np.array([i for i in range(1, com_r+1, haps_usr_r_dif)])
 ang_arr = np.array([i for i in range(ang_start, ang_end+1, ang_dif)])
@@ -43,7 +43,7 @@ for bs_idx, bs_r in enumerate(bs_r_list):
                 haps_usr_n = 1
                 haps_xy_arr = np.array([[r*np.cos(i/180*np.pi), r*np.sin(i/180*np.pi)] for i in range(ang_deg,0,int(360/haps_usr_n))])
                 usr_xy_arr = np.concatenate([haps_xy_arr, bs_xy_arr])
-                side_antenna_n = 4
+                side_antenna_n = 5
                 m = side_antenna_n**2 - bs_size*sec_size*usrs_per_sec
                 bs_pwr = 20
                 haps_total_pwr = 120

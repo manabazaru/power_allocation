@@ -52,13 +52,13 @@ class PlanarHAPS(HAPS):
                 usr_ant_angr[usr, ant] = rot_angr
         return usr_ant_angr
     
-    def get_user_antenna_angle_r_arr_from_user_xy_arr(self, xy_arr):
+    def get_user_antenna_angle_r_arr_from_user_xy_arr(self, xy_arr, usr_height=0.001):
         print("[INFO HAPS] Calculation of user angle from each antenna "+
               "element has been started.")
-        ang_arr = utils.xy2ang(xy_arr, -self.altitude)
+        ang_arr = utils.xy2ang(xy_arr, -self.altitude+usr_height)
         usr_n = len(ang_arr)
         usr_ant_angr = np.zeros([usr_n, self.ant_n, 3])
-        usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude)
+        usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude+usr_height)
         usr_xyz_arr = utils.angr2xyz(usr_angr_arr)
         flt_ant_xyz_arr = self.xyz_arr.reshape(self.sd_n**2,3)
         for usr in tqdm.tqdm(range(usr_n)):
@@ -70,7 +70,10 @@ class PlanarHAPS(HAPS):
                 rot_angr = utils.xyz2angr(rot_xyz)
                 usr_ant_angr[usr, ant] = rot_angr
         return usr_ant_angr
-
+    
+    def get_user_ang_arr_from_user_xy_arr(self, xy_arr, usr_height=0.001):
+        ang_arr = utils.xy2ang(xy_arr, -self.altitude+usr_height)
+        return ang_arr
 
 class VariableAntennaPlanarHAPS(PlanarHAPS):
     def __init__(self, side_antenna_n):
@@ -147,6 +150,35 @@ class CyrindricalHAPS(HAPS):
         usr_n = eqpt.get_usr_n()
         usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude)
         usr_xyz_arr = utils.angr2xyz(usr_angr_arr)
+        usr_sd_angr = np.zeros([usr_n, self.sd_n, 3])
+        usr_btm_angr = np.zeros([usr_n, self.btm_n, 3])
+        usr_ant_angr = np.zeros([usr_n, self.ant_n, 3])
+        flt_sd_xyz_arr = self.sd_xyz_arr.reshape(self.sd_n,3)
+        flt_sd_vec_dir = self.sd_vec_dir.reshape(self.sd_n)
+        for usr in tqdm.tqdm(range(usr_n)):
+            usr_xyz = usr_xyz_arr[usr]
+            for sd_ant in range(self.sd_n):
+                sd_xyz = flt_sd_xyz_arr[sd_ant]
+                shift_usr_xyz = usr_xyz - sd_xyz
+                shift_usr_angr = utils.xyz2angr(shift_usr_xyz)
+                shift_usr_angr[0] = utils.calc_az_dif(shift_usr_angr[0],
+                                                      flt_sd_vec_dir[sd_ant])
+                usr_sd_angr[usr, sd_ant] = shift_usr_angr
+            for btm_ant in range(self.btm_n):
+                btm_xyz = self.btm_xyz_arr[btm_ant]
+                shift_usr_xyz = usr_xyz - btm_xyz
+                yaw = -1*self.btm_rot_yaw[btm_ant]
+                rot_xyz = self.rot_usr_xyz(shift_usr_xyz, yaw, -90)
+                rot_angr = utils.xyz2angr(rot_xyz)
+                usr_btm_angr[usr, btm_ant] = rot_angr
+        usr_ant_angr = np.concatenate([usr_sd_angr, usr_btm_angr],1)
+        return usr_ant_angr
+
+    def get_user_antenna_angle_r_arr_from_user_xy_arr(self, xy_arr, usr_height=0.001):
+        print("[INFO HAPS] Calculation of user angle from each antenna "+
+              "element has been started.")
+        usr_n = len(xy_arr)
+        usr_xyz_arr = utils.xy2xyz(xy_arr, -self.altitude+usr_height)
         usr_sd_angr = np.zeros([usr_n, self.sd_n, 3])
         usr_btm_angr = np.zeros([usr_n, self.btm_n, 3])
         usr_ant_angr = np.zeros([usr_n, self.ant_n, 3])

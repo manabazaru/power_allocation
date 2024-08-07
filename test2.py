@@ -9,9 +9,9 @@ from integrated_environment import IntegratedEnvironment2 as ie2
 from matplotlib import pyplot as plt
 
 ###########################################################
-bs_size = 6
+bs_size = 1
 haps_com_r = 20
-usrs_per_sec = 10
+usrs_per_sec = 1
 bs_xy_arr = np.array([[15*np.cos(i/180*np.pi), 15*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/bs_size))])
 height_arr = np.zeros(bs_size)+0.051
 com_radius_arr = np.zeros(bs_size) + 2
@@ -38,22 +38,23 @@ bss = BaseStations(bs_size, height_arr, com_radius_arr, bs_xy_arr, max_gain_arr,
 bss_xy_arr = bss.get_users_xy_arr()
 p_haps = haps.VariableAntennaPlanarHAPS(side_antenna_n)
 int_nev = ie(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_total_pwr)
-# int_nev2 = ie2(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_total_pwr)
+int_nev2 = ie2(bss, p_haps, haps_xy_arr, m, usr_gain, bs_pwr, haps_total_pwr)
 bs_sinr_arr = int_nev.bs_sinr
 haps_sinr_arr = int_nev.haps_sinr
-# bs_sinr_arr2 = int_nev2.bs_sinr
+bs_sinr_arr2 = int_nev2.bs_sinr
 # haps_sinr_arr2 = int_nev2.haps_sinr
 bs_sinr_db_arr = 10 * np.log10(bs_sinr_arr)
 haps_sinr_db_arr = 10 * np.log10(haps_sinr_arr)
-# bs_sinr_db_arr2 = 10 * np.log10(bs_sinr_arr2)
+bs_sinr_db_arr2 = 10 * np.log10(bs_sinr_arr2)
 # haps_sinr_db_arr2 = 10 * np.log10(haps_sinr_arr2)
 # print(haps_sinr_db_arr)
 # print(bs_sinr_db_arr)
 # print(bs_sinr_db_arr2)
 # print(haps_sinr_db_arr2)
+# print(f"bs_sinr_db_arr:  average={np.average(bs_sinr_db_arr)}, mid={np.median}")
 
 #########################################################
-"""fig = plt.figure()
+fig = plt.figure()
 plt.scatter(bss_xy_arr[:,0], bss_xy_arr[:,1], s=10, c=bs_sinr_db_arr, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
@@ -67,24 +68,28 @@ plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.clim(-40, 20)
 plt.colorbar()
-plt.show()"""
+plt.show()
 
 fig3 = plt.figure()
 c1 = np.arange(haps_usr_n) * 30
 c2 = np.zeros(bs_size * sec_size * usrs_per_sec) - 1000
-c2[int_nev.cls_arr] = c1
+c2[int_nev.cls_arr-haps_usr_n] = c1
 x_arr = np.concatenate([haps_xy_arr[:,0], bss_xy_arr[:,0]])
 y_arr = np.concatenate([haps_xy_arr[:,1], bss_xy_arr[:,1]])
 c_arr = np.concatenate([c1, c2])
-plt.scatter(x_arr, y_arr, s=10, c=c_arr, cmap='jet')
+c_arr2 = np.concatenate([haps_sinr_db_arr, bs_sinr_db_arr])
+print(c_arr)
+print(f"haps_sinr:{haps_sinr_db_arr}")
+print(f"bs_sinr_arr{bs_sinr_db_arr}")
+plt.scatter(x_arr, y_arr, s=10, c=c_arr2, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
 plt.show()
 
-"""fig3 = plt.figure()
-plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr2, cmap='jet')
+fig3 = plt.figure()
+plt.scatter(haps_xy_arr[:,0], haps_xy_arr[:,1], s=10, c=haps_sinr_db_arr, cmap='jet')
 plt.xlim(-haps_com_r, haps_com_r)
 plt.ylim(-haps_com_r, haps_com_r)
 plt.colorbar()
-plt.show()"""
+plt.show()

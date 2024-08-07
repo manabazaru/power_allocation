@@ -30,6 +30,7 @@ class TwoStagePrecoding():
         self.trans_gain = param.trans_gain
         self.rcv_gain = param.rcv_gain     
         # for precoding matrix W_nf, W_bf
+        print(self.ant_n, M)
         self.w_nf = np.zeros([self.ant_n, M], dtype=np.complex64)
         self.w_bf = np.zeros([M, self.ue_usr_n], dtype=np.complex64)
         self.w = np.zeros([self.ant_n, self.ue_usr_n], dtype=np.complex64)
@@ -106,21 +107,25 @@ class TwoStagePrecoding():
             w_usr_sum = np.sqrt(abs(sum(w_vec*np.conjugate(w_vec))))
             self.w[:,usr] = w_unnorm[:,usr] / w_usr_sum  
     
-    def get_power_allocation(self, total_pwr):
+    def get_power_allocation(self, usr_ang_arr, total_pwr):
         score_arr = np.zeros(self.ue_usr_n)
         cls_usr_idx = np.zeros(self.ue_usr_n, dtype=int)
         for h_idx in range(self.ue_usr_n):
             minimum = 999999999999999
             min_idx = -1
-            h_angr = self.angr_arr[h_idx]
-            h_xyz = utils.angr2xyz(h_angr)
-            for b_idx in range(self.bs_usr_n):
-                b_angr = self.angr_arr[self.ue_usr_n+b_idx]
-                b_xyz = utils.angr2xyz(b_angr)
-                dis = np.sum((h_xyz-b_xyz)**2)
+            h_ang = usr_ang_arr[h_idx]
+            for b_idx in range(self.ue_usr_n, self.usr_n):
+                b_ang = usr_ang_arr[b_idx]
+                # dis = np.sum((h_xyz-b_xyz)**2)
+                # print('h_ang', h_ang, '\nb_ang', b_ang)
+                # print(f'h_xyz, {h_xyz.shape} \nb_xyz, {b_xyz.shape}')
+                ang_dif = utils.calc_ang_dif(h_ang, b_ang)
+                dis = np.sum(ang_dif**2)
+                # print(dis, b_ang)
                 if dis < minimum:
                     min_idx = b_idx
                     minimum = dis
+            print(f"min_idx ({h_idx}): {min_idx}, dis: {minimum}")
             cls_usr_idx[h_idx] = min_idx
             haps_h = self.h[h_idx]
             bs_h = self.h[min_idx]

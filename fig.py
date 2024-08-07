@@ -30,39 +30,6 @@ def save_plt_users_with_colorbar(xy_arr, fig_title, c_arr, c_max, c_min, r):
     plt.clim(c_min, c_max)
     plt.show()
     # save.save_fig(fig, fig_title)
-
-base_xy = [0, 10]
-xy_arr = []
-clr_arr = []
-xy_arr.append(base_xy)
-clr_arr.append(0)
-ang_unit = 0.5
-for i in range(-20, 20):
-    ang = i*ang_unit
-    if i == 0:
-        continue
-    ang_rad = 2 * np.pi * ang / 360
-    x = base_xy[0]*np.cos(ang_rad) - base_xy[1]*np.sin(ang_rad)
-    y = base_xy[0]*np.sin(ang_rad) + base_xy[1]*np.cos(ang_rad)
-    xy_arr.append([x,y])
-    c = 20 + np.random.randn(1)
-    clr_arr.append(c)
-xy_arr = np.array(xy_arr)
-save_plt_users_with_colorbar(xy_arr, "test", clr_arr, 25, 0, 20)
-
-xy2_arr = [base_xy]
-clr2_arr = [0]
-for i in range(10):
-    if i == 5:
-        continue
-    y = 5 + i
-    xy = [0, y]
-    xy2_arr.append(xy)
-    c = 20 + np.random.randn(1)
-    clr2_arr.append(c)
-xy2_arr = np.array(xy2_arr)
-save_plt_users_with_colorbar(xy2_arr, "test2", clr2_arr, 25, 0, 20)
-
 def make_SNR_SINR_figure(usr_list, snr_med, snr_std, sinr_med, sinr_std, fig_title):
     plt.style.use('default')
     sns.set()
