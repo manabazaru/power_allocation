@@ -7,13 +7,14 @@ from parameters import Parameter as param
 from integrated_environment import IntegratedEnvironment as ie
 from integrated_environment import IntegratedEnvironment2 as ie2
 from matplotlib import pyplot as plt
+import csv
 
 iter = 1
 ang_start = -360
 ang_end = -1
 ang_dif = 4
 bs_r_list = [10]
-haps_usr_r_dif = 10
+haps_usr_r_dif = 1
 com_r = 20
 r_arr = np.array([i for i in range(1, com_r+1, haps_usr_r_dif)])
 ang_arr = np.array([i for i in range(ang_start, ang_end+1, ang_dif)])
@@ -90,6 +91,12 @@ for i in range(len(bs_r_list)):
     plt.clim(-20, 40)
     plt.colorbar()
     plt.show()
+with open(f'./test3_ant={param.planar_antenna_size_of_side**2}.csv', 'w') as f:
+    writer = csv.writer(f)
+    for idx in range(c_arr.shape[1]):
+        data = [float(c_arr[0, idx])]
+        writer.writerow(data)
+    
 print(data_ave)
 print(ang_arr)
 print(r_arr)

@@ -19,6 +19,7 @@ import location
 import statistics
 import os
 from matplotlib import pyplot as plt
+import csv
 
 def cos_similarity(v1, v2):
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
@@ -52,6 +53,7 @@ def test_AUS(usr_n, usrs_per_group, radius):
 def test_ang_dif_vs_h_similarity(null_xy, att_cnt, com_r):
     null_ang = utils.xy2ang(null_xy, -param.z)
     rand_xy_arr = np.zeros([att_cnt, 2], dtype=float)
+    # rand_xy_arr = np.array([[0,10], [0,-10],[10,0],[-10,0]])
     ang_dif_arr = np.zeros(att_cnt, dtype=float)
     null_usr_xy_arr = np.zeros([2,2], dtype=float)
     score_arr = np.zeros(att_cnt, dtype=float)
@@ -61,6 +63,7 @@ def test_ang_dif_vs_h_similarity(null_xy, att_cnt, com_r):
     usr_ant_angr[0] = haps.get_user_antenna_angle_r_arr_from_user_xy_arr(np.array([null_xy]))[0]
     s2_cnt = 0
     for att in range(att_cnt):
+        # rand_xy = rand_xy_arr[att]
         rand_xy = rand_uni.generate_random_uniform_usr_xy(1, com_r)[0]
         rand_xy_arr[att] = rand_xy
         rand_ang = utils.xy2ang(rand_xy, -param.z)
@@ -76,23 +79,78 @@ def test_ang_dif_vs_h_similarity(null_xy, att_cnt, com_r):
         hnr = np.real(h_null)
         hni = np.imag(h_null)
         hrr = np.real(h_rand)
-        hri = np.real(h_rand)
+        hri = np.imag(h_rand)
         v1 = np.concatenate([hrr, -1*hri])
         v2 = np.concatenate([hnr, -1*hni])
         v3 = np.concatenate([hni, hnr])
         s1 = abs(cos_similarity(v1, v2))
         s2 = abs(cos_similarity(v1, v3))
+        print(s1, s2)
         s = max(s1, s2)
         if s1 < s2: s2_cnt+=1
         s_ang = np.arccos(s) /np.pi*180
         score_arr[att] = s_ang
     print(f"Number that s2 is selected: {s2_cnt}")
+    print(rand_xy_arr)
     return rand_xy_arr, score_arr, ang_dif_arr
 
-null_xy = np.array([10,10])
+def test_ang_dif_vs_h_similarity2(null_xy, ang_start, ang_end, ang_dif, r_dif, com_r):
+    rand_xys = []
+    for r in range(1, com_r+1, r_dif):
+        for ang in range(ang_start, ang_end+1, ang_dif):
+            x = r*np.cos(ang/180*np.pi)
+            y = r*np.sin(ang/180*np.pi)
+            rand_xys.append([x,y])
+    rand_xys = np.array(rand_xys)
+    att_cnt = len(rand_xys)
+    null_ang = utils.xy2ang(null_xy, -param.z)
+    rand_xy_arr = np.zeros([att_cnt, 2], dtype=float)
+    # rand_xy_arr = np.array([[0,10], [0,-10],[10,0],[-10,0]])
+    ang_dif_arr = np.zeros(att_cnt, dtype=float)
+    null_usr_xy_arr = np.zeros([2,2], dtype=float)
+    score_arr = np.zeros(att_cnt, dtype=float)
+    null_usr_xy_arr[0] = null_xy
+    haps = phaps()
+    usr_ant_angr = np.zeros([2, haps.ant_n, 3], dtype=float)
+    usr_ant_angr[0] = haps.get_user_antenna_angle_r_arr_from_user_xy_arr(np.array([null_xy]))[0]
+    s2_cnt = 0
+    for att in range(att_cnt):
+        # rand_xy = rand_xy_arr[att]
+        rand_xy = rand_xys[att]
+        rand_xy_arr[att] = rand_xy
+        rand_ang = utils.xy2ang(rand_xy, -param.z)
+        ang_dif = utils.calc_ang_dif(null_ang, rand_ang)
+        ang_dif_arr[att] = np.sum(ang_dif**2)
+        null_usr_xy_arr[1] = rand_xy
+        usr_ant_angr[1] = haps.get_user_antenna_angle_r_arr_from_user_xy_arr(np.array([rand_xy]))[0]
+        bf = BeamForming(usr_ant_angr)
+        bf.set_h()
+        h = bf.get_h()
+        h_null = h[0]
+        h_rand = h[1]
+        hnr = np.real(h_null)
+        hni = np.imag(h_null)
+        hrr = np.real(h_rand)
+        hri = np.imag(h_rand)
+        v1 = np.concatenate([hrr, -1*hri])
+        v2 = np.concatenate([hnr, -1*hni])
+        v3 = np.concatenate([hni, hnr])
+        s1 = abs(cos_similarity(v1, v2))
+        s2 = abs(cos_similarity(v1, v3))
+        print(s1, s2)
+        s = max(s1, s2)
+        if s1 < s2: s2_cnt+=1
+        s_ang = np.arccos(s) /np.pi*180
+        score_arr[att] = s_ang
+    print(f"Number that s2 is selected: {s2_cnt}")
+    print(rand_xy_arr)
+    return rand_xy_arr, score_arr, ang_dif_arr
+
+null_xy = np.array([-10,0])
 r = 20
-rand_xy_arr, score_arr, ang_dif_arr = test_ang_dif_vs_h_similarity(null_xy, 2000, r)
+rand_xy_arr, score_arr, ang_dif_arr = test_ang_dif_vs_h_similarity2(null_xy, -360, -1, 4, 1, r)
 print('min_score:', min(score_arr))
+
 fig = plt.figure()
 plt.scatter(ang_dif_arr, score_arr)
 plt.show()
@@ -103,4 +161,10 @@ plt.xlim(-r, r)
 plt.ylim(-r, r)
 plt.colorbar()
 plt.show()
+
+with open(f'./test4_ant={param.planar_antenna_size_of_side**2}.csv', 'w') as f:
+    writer = csv.writer(f)
+    for idx in range(len(score_arr)):
+        data = [float(score_arr[idx])]
+        writer.writerow(data)
         
