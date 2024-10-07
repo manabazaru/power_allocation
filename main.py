@@ -9,18 +9,18 @@ def main():
     #############################################################################################
     # simulation parameters
     r_list = [20]
-    nu_list = [i for i in range(12, 36, 6)]
-    user_scale = 2000
-    typ_list = ['sendai', 'osaka', 'nagoya', 'tokyo']
-    # typ_list = ['random' + str(nu*user_scale) for nu in nu_list]
-    dsidx_size = 1
-    dsidx_head = 0
+    nu_list = [i for i in range(12, 13, 6)]
+    user_scale = 100
+    # typ_list = ['sendai', 'osaka', 'nagoya','tokyo'] 
+    typ_list = ['random' + str(nu*user_scale) for nu in nu_list]
+    dsidx_size = 30
+    dsidx_head = 30
     shp_list = ['p']
-    t_pwr_list = [150]
-    alg_list = ['AUS', 'ACUS3', 'ACUS4', 'ACUS5']
+    t_pwr_list = [120]
+    alg_list = ['RUS']
     SIMidx_list = [0]
     DSidx_dict = {'tokyo':[0], 'osaka':[0], 'nagoya':[0], 'sendai':[0]}
-    nu_typ_loop = False
+    nu_typ_loop = True
     if nu_typ_loop:
         for typ in typ_list:
             DSidx_dict[typ] = [i for i in range(dsidx_head, dsidx_head+dsidx_size)]

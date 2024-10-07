@@ -13,12 +13,13 @@ from us_equipment import AUSEquipment
 import numpy as np
 from us_equipment import AUSEquipment
 import statistics
+import time
 
 # 2023/11/23
 # generate heatmap of tokyo whose radius list is [20, 50, 100]
 def generate_tokyo_heatmap():
     block_n = 50
-    r_list = [20, 50, 100]
+    r_list = [20]
     for r in r_list:
         sim = simulation.Dataset('tokyo', 12, r, 'p', 0)
         sim.setup_xy()
@@ -524,7 +525,7 @@ def generate_med_cap_nu(dist_typ, grp_n, nu_list, r_list, shp_list, dsidx_list, 
 
 def execute():
     path.set_cur_dir()
-    # generate_tokyo_heatmap()
+    generate_tokyo_heatmap()
     alg_list =['AUS', 'ACUS3', 'ACUS4', 'ACUS5']
     sim_idx_dict = {}
     for alg in alg_list: sim_idx_dict[alg] = 0
@@ -564,6 +565,6 @@ def execute():
         # generate_cumulative_cap(typ, nu, r, shp, dsidx_list, alg_list, 120, sim_idx_dict, x_lim_list[nu_idx], x_range_list[nu_idx])
         # generate_SINR_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [25, 40], 5)
         # generate_mAD_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [10, 50], 5)
-        generate_user_capacity_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [25, 40], 5)
+        # generate_user_capacity_CDF(city, nu, [20], ['p'], dsidx_list, alg_list, 120, sim_idx_dict, [25, 40], 5)
         
 execute()

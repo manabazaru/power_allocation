@@ -106,7 +106,8 @@ class Grouping():
             min_ad = self.min_ad_arr[group]
             ang_dif = self.eqpt.get_ang_dif(usr1, usr2)
             print(f"[{group_idx}] group {group}: minAD={min_ad}, " + 
-                  f"pair={[usr1, usr2]}, az={ang_dif[0]}, el={ang_dif[1]}")
+                  f"pair={[usr1, usr2]}, user1={self.eqpt.get_angs(usr1)}, " + 
+                  f"user2={self.eqpt.get_angs(usr2)}, az={ang_dif[0]}, el={ang_dif[1]}")
 
     def print_group_info_all(self):
         start = 0

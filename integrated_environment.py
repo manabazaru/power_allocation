@@ -33,6 +33,11 @@ class IntegratedEnvironment():
         self.noise_fig = param.noise_figure
         self.noise = 0
         self.haps_sinr = np.zeros([self.haps_usr_n])
+        self.haps_sig_arr = np.zeros([self.haps_usr_n])
+        self.haps_intf_arr = np.zeros([self.haps_usr_n])
+        self.haps_ter_intf_arr = np.zeros([self.haps_usr_n])
+        self.haps_ns_arr = np.zeros([self.haps_usr_n])
+
         self.bs_sinr = np.zeros([self.bs_usr_n])
         self.w = self.precoder.w
         self.bs_n = self.bss.bs_n
@@ -41,7 +46,6 @@ class IntegratedEnvironment():
         self.set_noise()
         self.set_SINR(bs_pwr, self.haps_power_arr)
         pwr_arr, cls_arr = self.precoder.get_power_allocation(self.haps_usr_ang_arr, haps_total_pwr)
-        print(pwr_arr, cls_arr)
         self.pwr_arr = pwr_arr
         self.cls_arr = cls_arr
 
@@ -57,6 +61,7 @@ class IntegratedEnvironment():
             wu = self.w[:,usr]
             sig = abs(sum(hu*wu))**2 * haps_power_arr[usr]
             intf = 0
+            bs_intf = 0
             for usr2 in range(self.haps_usr_n):
                 if usr == usr2:
                     continue
@@ -65,9 +70,13 @@ class IntegratedEnvironment():
             for bs_idx in range(self.bs_n):
                 for sec_idx in range(self.sec_n):
                     g = self.haps_g[usr, bs_idx, sec_idx]
-                    intf += abs(g)**2 * bs_pwr
-            self.haps_sinr[usr] = sig / (intf + self.noise)
-            print(f"HAPS: sig={sig}, intf={intf}, ns={self.noise}")
+                    bs_intf += abs(g)**2 * bs_pwr
+            self.haps_sinr[usr] = sig / (intf + bs_intf + self.noise)
+            self.haps_sig_arr[usr] = sig
+            self.haps_intf_arr[usr] = intf
+            self.haps_ter_intf_arr[usr] = bs_intf
+            self.haps_ns_arr[usr] = self.noise
+            # print(f"HAPS: sig={sig}, intf={intf}, bs_intf={bs_intf} ns={self.noise}")
         # terrestrial user
         for usr in range(self.bs_usr_n):
             bs_sec_idx = self.bs_usr_bs_sec_main_arr[usr]

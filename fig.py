@@ -20,6 +20,14 @@ def save_plt_all_users(xy_arr, fig_title):
     plt.show()
     save.save_fig(fig, fig_title)
 
+def save_plt_all_users2(xy_arr, fig_title, r):
+    fig = plt.figure()
+    plt.scatter(xy_arr[:,0], xy_arr[:,1])
+    plt.xlim(-r, r)
+    plt.ylim(-r, r)
+    plt.show()
+    save.save_fig(fig, fig_title)
+
 def save_plt_users_with_colorbar(xy_arr, fig_title, c_arr, c_max, c_min, r):
     fig = plt.figure()
     plt.scatter(xy_arr[:,0], xy_arr[:,1], s=10, c=c_arr, cmap='jet')
@@ -106,6 +114,23 @@ def make_sig_intf_noise_figure(x_list, sig_med, sig_std, intf_med, intf_std, ns_
     ax = fig.add_subplot(1, 1, 1)
     ax.errorbar(x_list, intf_med, intf_std, marker='o', label='interference', capthick=1, capsize=8, lw=1)
     ax.errorbar(x_list, sig_med, sig_std, marker='o', label='signal', capthick=1, capsize=8, lw=1)
+    ax.errorbar(x_list, ns_med, ns_std, marker='o', label='noise', capthick=1, capsize=8, lw=1)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    ax.legend()
+    plt.show()
+    save.save_fig(fig, fig_title)
+
+def make_sig_intf_noise_figure2(x_list, sig_med, sig_std, intf_med, intf_std, bs_med, bs_std,
+                                ns_med, ns_std, x_label, y_label, fig_title):
+    plt.style.use("default")
+    sns.set()
+    sns.set_palette('Set1')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.errorbar(x_list, intf_med, intf_std, marker='o', label='interference', capthick=1, capsize=8, lw=1)
+    ax.errorbar(x_list, sig_med, sig_std, marker='o', label='signal', capthick=1, capsize=8, lw=1)
+    ax.errorbar(x_list, bs_med, bs_std, marker='o', label='terrstrial interference', capthick=1, capsize=8, lw=1)
     ax.errorbar(x_list, ns_med, ns_std, marker='o', label='noise', capthick=1, capsize=8, lw=1)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
@@ -391,7 +416,19 @@ def heatmap(r, block_population, fig_title, save_flg):
     plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)
-    
+
+def SINR_heatmap(r, block_sinr, fig_title, save_flg):
+    print(block_sinr.shape) 
+    df = pd.DataFrame(block_sinr)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    im = ax.imshow(np.flipud(df.T), extent=(-r,r,-r,r), cmap='jet')
+    ax.set_xlabel('km')
+    ax.set_ylabel('km')
+    plt.colorbar(im, label=f'people/block')
+    plt.show()
+    if save_flg:
+        save.save_fig(fig, fig_title)
+
 def make_flop_table(data_arr, col_label_arr, fig_title):
     fig, ax = plt.subplots(1, 1)
     ax.axis("tight")

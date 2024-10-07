@@ -30,7 +30,7 @@ class TwoStagePrecoding():
         self.trans_gain = param.trans_gain
         self.rcv_gain = param.rcv_gain     
         # for precoding matrix W_nf, W_bf
-        print(self.ant_n, M)
+        # print(self.ant_n, M)
         self.w_nf = np.zeros([self.ant_n, M], dtype=np.complex64)
         self.w_bf = np.zeros([M, self.ue_usr_n], dtype=np.complex64)
         self.w = np.zeros([self.ant_n, self.ue_usr_n], dtype=np.complex64)
@@ -61,7 +61,7 @@ class TwoStagePrecoding():
         h_radiat = -min(12*(az/self.three_bw_ang)**2, self.max_att)
         radiat = -min(-(v_radiat+h_radiat), self.max_att)
         gain_db = self.trans_gain + radiat + self.rcv_gain
-        gain = 10**(gain_db/10)
+        gain = 10**(gain_db/20)
         return gain
 
     def set_radiation_pattern(self):
@@ -125,7 +125,7 @@ class TwoStagePrecoding():
                 if dis < minimum:
                     min_idx = b_idx
                     minimum = dis
-            print(f"min_idx ({h_idx}): {min_idx}, dis: {minimum}")
+            # print(f"min_idx ({h_idx}): {min_idx}, dis: {minimum}")
             cls_usr_idx[h_idx] = min_idx
             haps_h = self.h[h_idx]
             bs_h = self.h[min_idx]
@@ -183,7 +183,7 @@ class BeamForming():
         h_radiat = -min(12*(az/self.three_bw_ang)**2, self.max_att)
         radiat = -min(-(v_radiat+h_radiat), self.max_att)
         gain_db = self.trans_gain + radiat + self.rcv_gain
-        gain = 10**(gain_db/10)
+        gain = 10**(gain_db/20)
         return gain
 
     def set_radiation_pattern(self):

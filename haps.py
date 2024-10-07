@@ -202,6 +202,10 @@ class CyrindricalHAPS(HAPS):
                 usr_btm_angr[usr, btm_ant] = rot_angr
         usr_ant_angr = np.concatenate([usr_sd_angr, usr_btm_angr],1)
         return usr_ant_angr
+    
+    def get_user_ang_arr_from_user_xy_arr(self, xy_arr, usr_height=0.001):
+        ang_arr = utils.xy2ang(xy_arr, -self.altitude+usr_height)
+        return ang_arr
 
 
 class CyrindricalSideHAPS(HAPS):

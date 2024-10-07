@@ -114,3 +114,9 @@ def load_flop(ds_type):
     data_arr = load_csv(path).astype(float)
     print(f"[INFO LOAD] data: flop_arr,  path: {path}")
     return data_arr
+
+def load_test_arr(ds_type):
+    path = prop.test_path + ds_type + '.csv'
+    data_arr = load_csv(path).astype(float)
+    print(f"[INFO LOAD] data: test_arr,  path: {path}")
+    return data_arr

@@ -22,6 +22,12 @@ import os
 path.set_cur_dir()
 np.set_printoptions(threshold=np.inf)
 
+# bs_xy_arr = np.array([[(10+5*i)*np.cos(np.pi*2/8*i), (10+5*i)*np.sin(np.pi*2/8*i)] for i in range(8)])
+bs_xy_arr = np.array([[2,0], [0, 7], [-12, 0], [0,-17]])
+new_bs_xy_arr = np.zeros([len(bs_xy_arr),2])
+new_bs_xy_arr[:,0] = bs_xy_arr[:,1]
+new_bs_xy_arr[:,1] = bs_xy_arr[:,0]
+# fig.save_plt_all_users2(new_bs_xy_arr, 'bs_style1', 50)
 def test_AUS(usr_n, usrs_per_group, radius):
     start = 0
     end = usr_n // usrs_per_group -1
@@ -36,6 +42,9 @@ def test_AUS(usr_n, usrs_per_group, radius):
     aus.print_group_info(start, end)
     print(f"Calculation time: {end_time-start_time}")
     group_table = aus.get_group_table()
+    for i in range(1):
+        group_xy_arr = xy_arr[group_table[i]]
+        fig.save_plt_all_users2(group_xy_arr, "AUS_user_group_idx="+str(i), radius)
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylindrical', 'random')
@@ -46,7 +55,7 @@ def test_AUS(usr_n, usrs_per_group, radius):
     # print(np.average((ev.get_SNR())))
     # save.save_eval_arr(cap_list, filename)
     fig.make_cumulative_figures(np.array([cap_list]), ['AUS'], "fig_for_20231026", [0,1.8],0.2, False)
-
+test_AUS(1200, 12, 20)
 # test_AUS(1200, 12, 100)
 
 def test_AUS2(city, usrs_per_group):
@@ -105,11 +114,12 @@ def test_RUS_with_random(usr_n, radius, usrs_per_group):
     # print(ev.cond_list)
     # print("average", np.average(ev.cond_list))
     # print("median", np.median(ev.cond_list))
-    # cap_list = ev.get_sum_cap_arr()
+    cap_list = ev.get_sum_cap_arr()
     # save.save_eval_arr(cap_list, filename)
-    # fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", True)
+    fig.make_cumulative_figures(np.array([cap_list]), ['RUS'], "fig_for_20231026", [0,1.8], 0.2, False)
     return ev.cond_list
 
+# test_RUS_with_random(12000, 50, 12)
 """nu = 12
 usr = 1200
 r = 50
@@ -169,6 +179,9 @@ def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
     mrus.print_group_info(start, end)
     print(f"Calculation time: {end_time-start_time}")
     group_table = mrus.get_group_table()
+    for i in range(1):
+        group_xy_arr = xy_arr[group_table[i]]
+        fig.save_plt_all_users2(group_xy_arr, "ACUS4_user_group_idx="+str(i), radius)
     haps = chaps()
     usr_ant_angr = haps.get_user_antenna_angle_r_arr(eqpt)
     # save.save_user_HAPS_angle(usr_ant_angr, 'cylinder', city)
@@ -177,7 +190,7 @@ def test_MRUS_with_random(usr_n, usrs_per_group, radius, M):
     save.save_eval_arr(cap_list, filename)
     # save.save_user_HAPS_angle(usr_ant_angr, 'planar', 'MRUS_tokyo')
 
-test_MRUS_with_random(1200, 12, 100, 4)
+test_MRUS_with_random(1200, 12, 20, 4)
 
 def test_MRUS(city, M, usrs_per_group):
     start = 0
@@ -594,5 +607,5 @@ sin_title_dif_r = f'{style}_sin_fig_user={users_per_group}_radius={r_list[0]}~{r
 
 # generate_user_distribution_of_max_min_interference(usr_list, rep, r, 'no_grouping')
 # generate_interference_signal_noise_figure_with_dif_r(r_list, rep, users_per_group, 'log_10(L[km])', 'median dBm', sin_title_dif_r)
-# generate_interference_signal_noise_figure_with_dif_usr(usr_list, rep, r, 'users per group', 'median dBm', sin_title_dif_usr)
+generate_interference_signal_noise_figure_with_dif_usr(usr_list, rep, r, 'users per group', 'median dBm', sin_title_dif_usr)
 # test_of_dif_r(r_list, rep, users_per_group, 'log_10(L[km])', 'median dBm', 'test_' + sin_title_dif_r)

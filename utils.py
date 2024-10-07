@@ -197,6 +197,15 @@ def get_heatmap_data_from_xy_arr(xy_arr, block_n, radius):
         block_population[block_indices[0], block_indices[1]] += 1
     return block_population
 
+def get_block_indices_of_heatmap_from_xy_arr(xy_arr, block_n, radius):
+    scale = radius * 2 / block_n
+    block_idc_arr = np.zeros([len(xy_arr), 2], dtype=int)-1
+    for xy_idx in range(len(xy_arr)):
+        xy = xy_arr[xy_idx]
+        block_idc = np.array((xy+radius)//scale, dtype=int)
+        block_idc_arr[xy_idx] = block_idc
+    return block_idc_arr
+
 def xy2ang(xy_arr, z):
     xyz = xy2xyz(xy_arr, z)
     angr = xyz2angr(xyz)

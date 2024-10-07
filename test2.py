@@ -22,7 +22,7 @@ side_att_arr = np.zeros(bs_size) + 25
 max_att_arr = np.zeros(bs_size) + 20
 max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
-sec_size = 3
+sec_size = 1
 usr_height = 0.001
 haps_usr_n = 1
 haps_xy_arr = np.array([[18*np.cos(i/180*np.pi), 18*np.sin(i/180*np.pi)] for i in range(-180,180,int(360/haps_usr_n))])

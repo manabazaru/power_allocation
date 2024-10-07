@@ -112,3 +112,8 @@ def save_log(date_string, log_string):
     logger.addHandler(fh)
     logger.log(20, log_string)
     print(f'[INFO SAVE] data: log, path: {file_path}')
+
+def save_test_arr(test_arr, ds_type):
+    path = prop.test_path + ds_type + '.csv'
+    save_csv(test_arr, path)
+    print(f'[INFO SAVE] data: test_arr, path: {path}')
