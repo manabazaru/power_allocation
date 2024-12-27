@@ -22,14 +22,45 @@ import datetime
 import path
 import time
 import statistics
+import os
+
+def get_uniform_user_dist_from_bs(bs_xy, usr_n, start_deg, r):
+    ang_unit = 2*np.pi/usr_n
+    rad_arr = np.array([start_deg/180*np.pi+ang_unit*i for i in range(usr_n)])
+    base_xy = np.array([r,0])
+    usr_xy_list = []
+    for rad in rad_arr:
+        rotate_matrix = np.array([[np.cos(rad), -np.sin(rad)], [np.sin(rad), np.cos(rad)]])
+        usr_xy = np.dot(rotate_matrix, base_xy)
+        usr_xy_list.append(usr_xy)
+    usr_xy_arr = np.array(usr_xy_list)
+    usr_xy_arr[:,0] += bs_xy[0]
+    usr_xy_arr[:,1] += bs_xy[1]
+    return usr_xy_arr
 
 path.set_cur_dir()
 ###################################################################
 # setting of base station
 usrs_per_sec = 1
-bs_xy_arr = np.array([[2,0], [0, 7], [-12, 0], [0,-17]])
-# bs_xy_arr = np.array([[(10+5*i)*np.cos(np.pi*2/8*i), (10+5*i)*np.sin(np.pi*2/8*i)] for i in range(8)])
+bs_n = 6
+# bs_xy_arr = np.array([[2,0], [0, 7], [-12, 0], [0,-17]])
+r = 2.5
+bs_xy_arr = np.array([[r*np.cos(2*np.pi/bs_n*i), r*np.sin(2*np.pi/bs_n*i)] for i in range(bs_n)])
+# bs_xy_arr = np.array([[0, 25], [25, 0]])
+# bs_xy_arr = np.array([[25*np.cos(np.pi*2/bs_n*i+np.pi/4), 25*np.sin(2*np.pi/bs_n*i+np.pi/4)] for i in range(bs_n)])
+# bs_xy_arr = np.array([[(7+5*i)*np.cos(np.pi*2/bs_n*i), (7+5*i)*np.sin(np.pi*2/bs_n*i)] for i in range(bs_n)])
 # bs_xy_arr = np.array([[3,0], [4,4], [0, 8], [-7,7], [-13,0], [-11,-11], [0,-18], [14, -14]])
+"""bs_xy_arr = np.array([[10,0], 
+                      [15/np.sqrt(2), -15/np.sqrt(2)],
+                      [0, -20],
+                      [-25/np.sqrt(2), -25/np.sqrt(2)],
+                      [-30, 0],
+                      [-35/np.sqrt(2), 35/np.sqrt(2)],
+                      [0, 40],
+                      [45/np.sqrt(2), 45/np.sqrt(2)]])"""
+print(bs_xy_arr)
+import sys 
+# sys.exit()
 bs_size = len(bs_xy_arr)
 bs_height_arr = np.zeros(bs_size)+0.051
 bs_com_radius_arr = np.zeros(bs_size) + 2
@@ -40,12 +71,17 @@ bs_side_att_arr = np.zeros(bs_size) + 25
 bs_max_att_arr = np.zeros(bs_size) + 20
 bs_max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
-sec_size = 3
+sec_size = 1
 bs_pwr = 20
+usr_r_from_base = 0.5
+bs_usr_xy_arrs = np.array([get_uniform_user_dist_from_bs(bs, 
+                                                        sec_size*usrs_per_sec, 
+                                                        90, usr_r_from_base)
+                         for bs in bs_xy_arr])
 ###################################################################
 # setting of haps
 nu_list = [12]
-alg_list = ['ACUS4']
+alg_list = ['RUS']
 side_ant_list = [14]
 att_size = 30
 haps_usr_n = 1200
@@ -54,6 +90,7 @@ user_type = 'random'+str(haps_usr_n)
 haps_altitude = 20
 haps_total_pwr = 120
 h_type = 'p'
+date = f'241223_bsn={bs_n}_r={r}_antdis=0.4'
 ##################################################################
 # setting of users
 usr_gain = -3
@@ -62,7 +99,7 @@ usr_height = 0.001
 bss = BaseStations(bs_size, bs_height_arr, bs_com_radius_arr, bs_xy_arr, 
                    bs_max_gain_arr, bs_azi_3db_arr, bs_elev_3db_arr,
                    bs_elev_tilt_arr, bs_side_att_arr, bs_max_att_arr, sec_size,
-                   users_per_sector_arr=usr_per_sec_arr)
+                   user_xy_arrs=bs_usr_xy_arrs)
 bss_xy_arr = bss.get_users_xy_arr()
 
 for side_ant in side_ant_list:
@@ -80,11 +117,13 @@ for side_ant in side_ant_list:
             bs_sinr_list = []
             tag = f'ant={side_ant}_shp={h_type}_nu={nu}_alg={alg}_r={haps_com_r}'
             sig_intf_terintf_ns_arr_list = []
+            output_list = [['id','x', 'y','signal', 'intf', 'ter_intf', 'noise', 'SINR']]
             for att_idx in range(att_size):
                 haps_xy_arr = load.load_xy(f'typ={user_type}_r={haps_com_r}_DSidx={att_idx}')
                 grp_table = load.load_group_table(f'typ={user_type}_Nu={nu}_r={haps_com_r}_z='+\
                                                   f'{haps_altitude}_alg={alg}_DSidx={att_idx}_' +\
                                                   f'SIMidx=0')
+                haps_sinr_db_arrs = np.zeros(grp_table.size,dtype=float)
                 haps_xy_list.append(haps_xy_arr)
                 for mems in grp_table:
                     haps_xys = haps_xy_arr[mems]
@@ -97,8 +136,20 @@ for side_ant in side_ant_list:
                     haps_ns_arr = int_nev.haps_ns_arr
                     bs_sinr_db = 10 * np.log10(bs_sinr)
                     haps_sinr_db = 10 * np.log10(haps_sinr)
-                    haps_sinr_list.append(haps_sinr_db)
+                    haps_sinr_db_arrs[mems] = haps_sinr_db
                     bs_sinr_list.append(bs_sinr_db)
+                    for idx in range(len(mems)):
+                        id = mems[idx]
+                        xy = haps_xys[idx]
+                        x = xy[0]
+                        y = xy[1]
+                        sig = haps_sig_arr[idx]
+                        intf = haps_intf_arr[idx]
+                        ter_intf = haps_ter_intf_arr[idx]
+                        ns = haps_ns_arr[idx]
+                        sinr = haps_sinr[idx]
+                        arr = np.array([id, x, y,sig, intf, ter_intf, ns, sinr])
+                        output_list.append(arr)
                     for bs_idx in range(len(bs_xy_arr)):
                         bs_xy = bs_xy_arr[bs_idx]
                         for mem_idx in range(len(mems)):
@@ -110,6 +161,7 @@ for side_ant in side_ant_list:
                                 intf = haps_intf_arr[mem_idx]
                                 ns = haps_ns_arr[mem_idx]
                                 sig_intf_terintf_ns_arr_list.append(np.array([sig, intf, ter_intf, ns]))
+                haps_sinr_list.append(haps_sinr_db_arrs)
             info_arr = np.zeros([len(sig_intf_terintf_ns_arr_list),4])
             for idx in range(len(sig_intf_terintf_ns_arr_list)):
                 for col in range(4):
@@ -126,13 +178,15 @@ for side_ant in side_ant_list:
             haps_sinr_arr = np.array(haps_sinr_list).flatten()
             bs_sinr_arr = np.array(bs_sinr_list).flatten()
             # save
-            com_tag = tag + f'_attsize={att_size}_240916'
+            com_tag = tag + f'_attsize={att_size}_' + date
             xy_path = 'xy_' + com_tag
             h_sinr_path = 'h_SINR_' + com_tag
             b_sinr_path = 'b_SINR_' + com_tag
+            data_path = 'datas_6_1_' + com_tag
             save.save_test_arr(haps_xy_arr, xy_path)
             save.save_test_arr(haps_sinr_arr, h_sinr_path)
             save.save_test_arr(bs_sinr_arr, b_sinr_path)
+            save.save_test_arr(np.array(output_list), data_path)
         med_arrs = np.array(med_arr_list)
         std_arrs = np.array(std_arr_list)
         fig.make_sig_intf_noise_figure2(alg_list, 

@@ -424,7 +424,7 @@ def SINR_heatmap(r, block_sinr, fig_title, save_flg):
     im = ax.imshow(np.flipud(df.T), extent=(-r,r,-r,r), cmap='jet')
     ax.set_xlabel('km')
     ax.set_ylabel('km')
-    plt.colorbar(im, label=f'people/block')
+    plt.colorbar(im, label=f'Average SINR in the block')
     plt.show()
     if save_flg:
         save.save_fig(fig, fig_title)

@@ -8,7 +8,7 @@ def main():
 
     #############################################################################################
     # simulation parameters
-    r_list = [20]
+    r_list = [50]
     nu_list = [i for i in range(12, 13, 6)]
     user_scale = 100
     # typ_list = ['sendai', 'osaka', 'nagoya','tokyo'] 

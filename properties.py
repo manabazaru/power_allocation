@@ -30,3 +30,4 @@ class Property:
                 'tokyo_50' : './data/mat/20210129_0_533946113_50km_0.001_33271ue.mat',
                 'tokyo_100': './data/mat/20210129_0_533946113_100km_0.001_40878ue.mat'}
     test_path = './data/csv/test_data/test_'
+    bs_sinr_path = './data/csv/bs_SINR/bs_sinr_'

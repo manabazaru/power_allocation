@@ -7,21 +7,24 @@ import statistics
 
 path.set_cur_dir()
 nu = 12
-alg = 'ACUS4'
+alg = 'RUS'
 side_ant = 14
 h_type= 'p'
 haps_com_r = 20
 att_size = 30
-blk_n = 50
-mode = 'min'
+blk_n = 80
+mode = 'ave'
+bs_n = 6
+r = 2.5
 # c_lim_dict = {"5_20":[-50, 20], "14_20":[-10,40], "14_50":[-40,40]}
-com_tag = f'_ant={side_ant}_shp={h_type}_nu={nu}_alg={alg}_r={haps_com_r}_attsize={att_size}_240916'
+# com_tag = "_ant=14_shp=p_nu=12_alg=ACUS4_r=20_attsize=30_241011_tgtxy=[  0 -17]_rlim=1_busrtyp=r1ang0"
+com_tag = f'_ant={side_ant}_shp={h_type}_nu={nu}_alg={alg}_r={haps_com_r}_attsize={att_size}_241223_bsn={bs_n}_r={r}_antdis=0.4'
 xy_tag = "xy" + com_tag
 h_sinr_tag = "h_SINR" + com_tag
 b_sinr_tag = "b_SINR" + com_tag
 xy_arr = load.load_test_arr(xy_tag)
 h_sinr_arr = load.load_test_arr(h_sinr_tag)
-b_sinr_arr = load.load_test_arr(b_sinr_tag)
+# b_sinr_arr = load.load_test_arr(b_sinr_tag)
 usr_n = len(h_sinr_arr)
 h_sorted_sinr_arr = sorted(h_sinr_arr)
 boarder_idx = int(len(h_sorted_sinr_arr)/2000)
@@ -39,6 +42,7 @@ for usr_idx in range(usr_n):
 def generate_H_user_SINR_heatmap(side_blk_n, r, sinr_arr, xy_arr, mode):
     blk_idc_arr = utils.get_block_indices_of_heatmap_from_xy_arr(xy_arr, side_blk_n, r)
     usr_n = len(xy_arr)
+    print(blk_idc_arr)
     mid_sinr_arr = np.zeros([side_blk_n, side_blk_n],dtype=float)
     for y in range(side_blk_n):
         for x in range(side_blk_n):

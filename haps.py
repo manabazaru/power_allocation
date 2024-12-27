@@ -61,7 +61,7 @@ class PlanarHAPS(HAPS):
         usr_angr_arr = utils.ang2angr_with_z(ang_arr, -self.altitude+usr_height)
         usr_xyz_arr = utils.angr2xyz(usr_angr_arr)
         flt_ant_xyz_arr = self.xyz_arr.reshape(self.sd_n**2,3)
-        for usr in tqdm.tqdm(range(usr_n)):
+        for usr in range(usr_n):
             usr_xyz = usr_xyz_arr[usr]
             for ant in range(self.ant_n):
                 xyz = flt_ant_xyz_arr[ant]
