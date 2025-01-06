@@ -44,7 +44,7 @@ path.set_cur_dir()
 usrs_per_sec = 1
 bs_n = 6
 # bs_xy_arr = np.array([[2,0], [0, 7], [-12, 0], [0,-17]])
-r = 2.5
+r = 17.5
 bs_xy_arr = np.array([[r*np.cos(2*np.pi/bs_n*i), r*np.sin(2*np.pi/bs_n*i)] for i in range(bs_n)])
 # bs_xy_arr = np.array([[0, 25], [25, 0]])
 # bs_xy_arr = np.array([[25*np.cos(np.pi*2/bs_n*i+np.pi/4), 25*np.sin(2*np.pi/bs_n*i+np.pi/4)] for i in range(bs_n)])
@@ -89,8 +89,8 @@ haps_com_r = 20
 user_type = 'random'+str(haps_usr_n)
 haps_altitude = 20
 haps_total_pwr = 120
-h_type = 'p'
-date = f'241223_bsn={bs_n}_r={r}_antdis=0.4'
+h_type = 'c'
+date = f'241223_bsn={bs_n}_r={r}_ant={h_type}'
 ##################################################################
 # setting of users
 usr_gain = -3
