@@ -71,9 +71,9 @@ bs_side_att_arr = np.zeros(bs_size) + 25
 bs_max_att_arr = np.zeros(bs_size) + 20
 bs_max_gain_arr = np.zeros(bs_size) + 14
 usr_per_sec_arr = np.zeros(bs_size, dtype=int) + usrs_per_sec
-sec_size = 1
+sec_size = 3
 bs_pwr = 20
-usr_r_from_base = 0.5
+usr_r_from_base = 1.5
 bs_usr_xy_arrs = np.array([get_uniform_user_dist_from_bs(bs, 
                                                         sec_size*usrs_per_sec, 
                                                         90, usr_r_from_base)
@@ -89,8 +89,8 @@ haps_com_r = 20
 user_type = 'random'+str(haps_usr_n)
 haps_altitude = 20
 haps_total_pwr = 120
-h_type = 'c'
-date = f'241223_bsn={bs_n}_r={r}_ant={h_type}'
+h_type = 'p'
+date = f'250108_bsn={bs_n}_r={r}_ant={h_type}_sec=3_usrfrombs=1.5'
 ##################################################################
 # setting of users
 usr_gain = -3

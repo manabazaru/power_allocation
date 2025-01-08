@@ -9,16 +9,16 @@ path.set_cur_dir()
 nu = 12
 alg = 'RUS'
 side_ant = 14
-h_type= 'c'
+h_type= 'p'
 haps_com_r = 20
 att_size = 30
-blk_n = 80
+blk_n = 160
 mode = 'ave'
 bs_n = 6
 r = 17.5
 # c_lim_dict = {"5_20":[-50, 20], "14_20":[-10,40], "14_50":[-40,40]}
 # com_tag = "_ant=14_shp=p_nu=12_alg=ACUS4_r=20_attsize=30_241011_tgtxy=[  0 -17]_rlim=1_busrtyp=r1ang0"
-com_tag = f'_ant={side_ant}_shp={h_type}_nu={nu}_alg={alg}_r={haps_com_r}_attsize={att_size}_241223_bsn={bs_n}_r={r}_ant=c'
+com_tag = f'_ant={side_ant}_shp={h_type}_nu={nu}_alg={alg}_r={haps_com_r}_attsize={att_size}_250108_bsn={bs_n}_r={r}_ant=p_sec=3_usrfrombs=1.5'
 xy_tag = "xy" + com_tag
 h_sinr_tag = "h_SINR" + com_tag
 b_sinr_tag = "b_SINR" + com_tag
